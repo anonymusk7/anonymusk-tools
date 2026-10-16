@@ -1,0 +1,18 @@
+<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width"><title>X year in review | anonymusk</title><link rel=stylesheet href=style.css><script src=common.js></script><script src=parse.js></script><main><h1>📼 Your X year in review</h1><p class=muted>Drop <code>bookmark.js</code> / <code>tweets.js</code> (X archive), a bookmarks JSON/CSV export. Nothing leaves your browser.</p>
+<div class=row><input type=file id=f accept=".js,.json,.csv"><label><input type=checkbox id=hide checked style="width:auto"> hide author handles</label><button id=rec disabled>Download 20s .webm</button></div><div id=st class=muted>Showing demo (aggregate stats from a real 3,640-bookmark account, no handles).</div><canvas id=cv width=1080 height=1920 style="max-width:400px"></canvas></main>
+<script>
+let S,stop;const cv=document.getElementById('cv');
+function stats(items){const cc={},ac={},mc={};items.forEach(i=>{cc[i.cat]=(cc[i.cat]||0)+1;if(i.author)ac[i.author]=(ac[i.author]||0)+1;if(i.date){const m=i.date.toISOString().slice(0,7);mc[m]=(mc[m]||0)+1}});const s=o=>Object.entries(o).sort((a,b)=>b[1]-a[1]);return{total:items.length,categories:s(cc).slice(0,8),authorsTop:s(ac).slice(0,5),authors:Object.keys(ac).length,months:Object.entries(mc).sort()}}
+function draw(c,t){const W=1080,H=1920;bg(c,t,W,H,260);
+ const sc=Math.floor(t/4),lt=t%4,a=ease(lt/.6)*(1-ease((lt-3.5)/.5));
+ if(sc==0){txt(c,'MY YEAR ON X',W/2,700,96,'#fff','center',a);txt(c,Math.round(S.total*ease(lt/2)).toLocaleString(),W/2,950,220,'#b98cff','center',a);txt(c,'posts saved',W/2,1050,56,'#ccc','center',a)}
+ if(sc==1){txt(c,'WHAT I WAS INTO',W/2,300,72,'#fff','center',a);const mx=S.categories[0]?.[1]||1;S.categories.slice(0,6).forEach(([k,v],i)=>{const e=ease((lt-.3-i*.2)/.8),y=450+i*200;c.globalAlpha=a;c.fillStyle=`hsl(${260+i*25},80%,65%)`;c.fillRect(100,y,(W-200)*v/mx*e,90);c.globalAlpha=1;txt(c,k.slice(0,30),110,y-15,38,'#fff','left',a);txt(c,v,W-110,y+62,44,'#000','right',a*e)})}
+ if(sc==2){txt(c,'WHEN I SAVED',W/2,300,72,'#fff','center',a);const m=S.months.slice(-24),mx=Math.max(...m.map(x=>x[1]),1),bw=(W-160)/m.length;m.forEach(([k,v],i)=>{const e=ease((lt-i*.05)/.6),h=900*v/mx*e;c.globalAlpha=a;c.fillStyle='#b98cff';c.fillRect(80+i*bw+4,1500-h,bw-8,h)});c.globalAlpha=1;const pk=m.slice().sort((x,y)=>y[1]-x[1])[0];if(pk)txt(c,'peak: '+pk[0]+' ('+pk[1]+')',W/2,1620,52,'#fff','center',a)}
+ if(sc==3){txt(c,'TOP VOICES',W/2,400,72,'#fff','center',a);if(S.authorsTop&&S.authorsTop.length&&!hide.checked)S.authorsTop.forEach(([k,v],i)=>txt(c,`${i+1}. ${k} · ${v}`,W/2,600+i*130,60,'#fff','center',ease((lt-i*.25)/.5)*a));else{txt(c,(S.authors||0).toLocaleString(),W/2,850,200,'#b98cff','center',a);txt(c,'different accounts',W/2,960,56,'#ccc','center',a)}}
+ if(sc==4){txt(c,'#1 obsession',W/2,800,60,'#ccc','center',a);txt(c,(S.categories[0]||['?'])[0],W/2,920,64,'#fff','center',a);txt(c,'make yours →',W/2,1300,48,'#b98cff','center',a);txt(c,'anonymusk7.github.io/anonymusk-tools',W/2,1370,40,'#fff','center',a)}
+ wm(c,W,H)}
+function show(s){S=s;stop&&stop();stop=loop(cv,draw,20);rec.disabled=false}
+fetch('demo.json').then(r=>r.json()).then(d=>show({...d,authorsTop:[]}));
+f.onchange=async()=>{try{const it=parseAny(await f.files[0].text());show(stats(it));st.textContent=it.length+' items parsed locally.'}catch(e){st.textContent='Could not parse: '+e.message}};
+rec.onclick=()=>{stop&&stop();recordCanvas(cv,draw,20,'x-year-in-review',rec)};
+</script>

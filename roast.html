@@ -1,0 +1,26 @@
+<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width"><title>Roast my wallet | anonymusk</title><link rel=stylesheet href=style.css><script src=common.js></script><main><h1>🔥 Roast my wallet</h1><p class=muted>Paste any public EVM (0x…) or Solana address. We read public balance + tx count from free public RPCs and judge you. No AI, no mercy, no keys.</p>
+<div class=row><input id=a size=46 value="0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"><button id=go>Roast me</button><button id=rec disabled>Download .webm</button></div><div id=st class=muted></div><canvas id=cv width=1080 height=1080></canvas></main>
+<script>
+const cv=document.getElementById('cv');let R,stop;
+async function rpc(u,m,p){const r=await fetch(u,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:1,method:m,params:p})});return (await r.json()).result}
+async function price(id){try{return (await (await fetch('https://api.coingecko.com/api/v3/simple/price?ids='+id+'&vs_currencies=usd')).json())[id].usd}catch(e){return null}}
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function verdict(usd,tx,chain){const b=usd<10?'broke':usd<1000?'small':usd<100000?'mid':'whale',x=tx==null?'mid':tx<10?'ghost':tx<300?'mid':'degen';
+ const L={broke:['This wallet has less than a gas fee in it. Respect the commitment to being poor.','Your portfolio is a rounding error with a seed phrase.','You are not "early". You are just empty.'],small:['Enough to buy one memecoin and regret it twice.','A portfolio that fits in a single candle wick.','Diversified across exactly one bad decision.'],mid:['Comfortable enough to be dangerous. Not rich enough to be forgiven.','You could exit. You will not exit.','Mid bag, main-character energy.'],whale:['Please stop market buying at the top, the rest of us live here.','Whale detected. Exit liquidity spotted (it was us).','You are why the chart has a big red candle every Sunday.']};
+ const T={ghost:'Barely transacts. Possibly a cold wallet, possibly a coma.',mid:'Moderately active. Clicks "approve" without reading, like everyone.',degen:'Transaction count suggests you trade like gas is free. It is not.'};
+ const score=Math.min(100,Math.round((Math.log10(usd+1)*10)+(tx?Math.log10(tx+1)*15:0)));
+ return{line:pick(L[b]),line2:T[x],score,title:{broke:'NGMI',small:'Exit Liquidity',mid:'Bag Holder',whale:'Market Mover'}[b]}}
+async function go(){const ad=a.value.trim();st.textContent='reading chain…';try{let usd,tx,chain,bal;
+ if(/^0x[a-fA-F0-9]{40}$/.test(ad)){chain='ETH';const[b,n]=await Promise.all([rpc('https://ethereum-rpc.publicnode.com','eth_getBalance',[ad,'latest']),rpc('https://ethereum-rpc.publicnode.com','eth_getTransactionCount',[ad,'latest'])]);bal=Number(BigInt(b))/1e18;tx=parseInt(n,16);usd=bal*((await price('ethereum'))||3000)}
+ else if(/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(ad)){chain='SOL';const b=await rpc('https://solana-rpc.publicnode.com','getBalance',[ad]);bal=b.value/1e9;tx=null;usd=bal*((await price('solana'))||150)}
+ else throw Error('not an EVM or Solana address');
+ R={ad,chain,bal,usd,tx,...verdict(usd,tx,chain)};st.textContent=`${bal.toFixed(4)} ${chain} (~$${fmt(usd)})${tx!=null?' · '+tx+' txs sent':''} · native balance only`;stop&&stop();stop=loop(cv,draw,10);rec.disabled=false}catch(e){st.textContent='Error: '+e.message}}
+function wrap(c,s,x,y,w,lh,size,a){c.font=`700 ${size}px Inter,system-ui`;const ws=s.split(' ');let l='';for(const w2 of ws){if(c.measureText(l+w2).width>w){txt(c,l,x,y,size,'#fff','center',a);l='';y+=lh}l+=w2+' '}txt(c,l,x,y,size,'#fff','center',a)}
+function draw(c,t){const W=1080,H=1080;bg(c,t,W,H,10);const sh=t>1&&t<1.6?(Math.random()-.5)*20:0;c.save();c.translate(sh,0);
+ txt(c,'WALLET ROAST 🔥',W/2,130,56,'#ff8a5d','center',ease(t/.5));txt(c,R.chain+' · '+R.ad.slice(0,6)+'…'+R.ad.slice(-4),W/2,190,32,'#aaa','center',ease(t/.5));
+ txt(c,'$'+fmt(R.usd*ease((t-.5)/1.5)),W/2,360,130,'#fff','center',ease((t-.5)/.4));
+ const s=ease((t-2)/.5);c.save();c.translate(W/2,520);c.scale(.5+.5*s+(1-s)*1.5,.5+.5*s+(1-s)*1.5);txt(c,R.title.toUpperCase(),0,30,100,'#ff3d5d','center',s);c.restore();
+ wrap(c,R.line,W/2,680,900,60,46,ease((t-3)/.6));wrap(c,R.line2,W/2,850,880,48,34,ease((t-4.5)/.6));
+ txt(c,'degen score '+Math.round(R.score*ease((t-6)/1.5))+'/100',W/2,990,40,'#ff8a5d','center',ease((t-6)/.4));c.restore();wm(c,W,H)}
+document.getElementById("go").onclick=go;rec.onclick=()=>{stop&&stop();recordCanvas(cv,draw,10,'wallet-roast',rec)};
+</script>
