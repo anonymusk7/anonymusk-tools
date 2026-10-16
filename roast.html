@@ -22,5 +22,5 @@ function draw(c,t){const W=1080,H=1080;bg(c,t,W,H,10);const sh=t>1&&t<1.6?(Math.
  const s=ease((t-2)/.5);c.save();c.translate(W/2,520);c.scale(.5+.5*s+(1-s)*1.5,.5+.5*s+(1-s)*1.5);txt(c,R.title.toUpperCase(),0,30,100,'#ff3d5d','center',s);c.restore();
  wrap(c,R.line,W/2,680,900,60,46,ease((t-3)/.6));wrap(c,R.line2,W/2,850,880,48,34,ease((t-4.5)/.6));
  txt(c,'degen score '+Math.round(R.score*ease((t-6)/1.5))+'/100',W/2,990,40,'#ff8a5d','center',ease((t-6)/.4));c.restore();wm(c,W,H)}
-document.getElementById("go").onclick=go;rec.onclick=()=>{stop&&stop();recordCanvas(cv,draw,10,'wallet-roast',rec)};
+if(location.hash)a.value=location.hash.slice(1);go();document.getElementById("go").onclick=go;rec.onclick=()=>{stop&&stop();recordCanvas(cv,draw,10,'wallet-roast',rec)};
 </script>
