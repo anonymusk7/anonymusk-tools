@@ -1,5 +1,5 @@
 const G29='https://anonymusk.gumroad.com/l/sztuha',G79='https://anonymusk.gumroad.com/l/ksgvlu',PF='https://anonymusk7.github.io/anonymusk/';
-document.addEventListener('DOMContentLoaded',()=>{const f=document.createElement('footer');f.innerHTML=`<a href="./">← all free tools</a> · made by <a href="${PF}">anonymusk</a> · want studio-grade launch videos? <a href="service.html">Done-for-you</a> / <a href="${G29}">Motion pack $29</a> / <a href="${G79}">Launch kit $79</a>`;document.body.appendChild(f)});
+document.addEventListener('DOMContentLoaded',()=>{const f=document.createElement('footer');f.innerHTML=`<a href="./">← all free tools</a> · made by <a href="${PF}">anonymusk</a> · want studio-grade launch videos? <a href="service.html">Done-for-you</a> / <a href="decks.html">Pitch deck in 24h</a> / <a href="${G29}">Motion pack $29</a> / <a href="${G79}">Launch kit $79</a>`;document.body.appendChild(f)});
 function fmt(n){if(n==null||isNaN(n))return'—';const a=Math.abs(n);return a>=1e9?(n/1e9).toFixed(2)+'B':a>=1e6?(n/1e6).toFixed(2)+'M':a>=1e3?(n/1e3).toFixed(1)+'K':a>=1?n.toFixed(2):n.toPrecision(3)}
 function ease(t){t=Math.max(0,Math.min(1,t));return 1-Math.pow(1-t,3)}
 // record canvas animation: draw(ctx,t seconds), dur seconds
