@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crypto Fear &amp; Greed Dashboard | anonymusk</title>
+<meta name="description" content="Live Crypto Fear &amp; Greed Index with an animated gauge, 90-day history chart, yesterday / week / month comparison, BTC dominance and total market cap. Free, runs in your browser.">
+<meta property="og:title" content="Crypto Fear &amp; Greed Dashboard | anonymusk">
+<meta property="og:description" content="Today's crypto market mood, 90-day history, BTC dominance and total market cap, plus a one-click tweet summary.">
+<meta name="theme-color" content="#07090c">
+<style>
+body{margin:0;background:#07090c;color:#e8f0ea;font:16px/1.5 Inter,system-ui,sans-serif}
+main{max-width:1000px;margin:auto;padding:24px}
+h1{font-size:2rem;margin:.2em 0}
+h2{font-size:1.15rem;margin:0 0 .5em}
+a{color:#5dffb0}
+input,button{font:inherit;padding:10px 14px;border-radius:10px;border:1px solid #2a3a30;background:#101612;color:#e8f0ea}
+button{background:#5dffb0;color:#04130b;font-weight:800;cursor:pointer;border:0}
+button:disabled{opacity:.5;cursor:default}
+button.ghost{background:#101612;color:#9fb;border:1px solid #2a3a30;font-weight:600}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.card{background:#0e1411;border:1px solid #1d2a22;border-radius:14px;padding:16px;margin:10px 0}
+.muted{color:#7a8a80}
+.mono,.num{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums}
+footer{text-align:center;padding:30px;color:#7a8a80;font-size:.9rem}
+.top{display:grid;grid-template-columns:1.1fr 1fr;gap:14px}
+.gwrap{position:relative;text-align:center}
+#gauge{width:100%;max-width:440px;aspect-ratio:2/1.15;display:block;margin:0 auto}
+.gval{font-size:3.2rem;font-weight:800;line-height:1;margin-top:-6px}
+.glbl{font-size:1.2rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.cmp{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.cmp>div,.mk>div{background:#0a0f0c;border:1px solid #1d2a22;border-radius:12px;padding:10px 12px}
+.k{font-size:.75rem;color:#7a8a80;text-transform:uppercase;letter-spacing:.08em}
+.v{font-size:1.5rem;font-weight:700}
+.d{font-size:.85rem}
+.up{color:#5dffb0}.dn{color:#ff5d7a}.flat{color:#9fb}
+.mk{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+#hist{width:100%;height:280px;display:block;border-radius:12px;background:#05070a;touch-action:pan-y}
+.tip{position:absolute;pointer-events:none;background:#0e1411;border:1px solid #2b5a40;border-radius:8px;padding:4px 8px;font-size:.8rem;white-space:nowrap;transform:translate(-50%,-110%);display:none}
+.pill{font-size:.8rem;padding:4px 10px;border-radius:99px;border:1px solid #2a3a30;color:#9fb}
+.status{min-height:1.5em}
+.err{color:#ff8a9e}
+.tweet{background:#05070a;border:1px dashed #2a3a30;border-radius:10px;padding:10px 12px;font-size:.9rem;word-break:break-word;flex:1;min-width:220px}
+.capture{border-color:#2b5a40;background:linear-gradient(135deg,#0c1712,#0e1020)}
+.capture input[type=email]{flex:1;min-width:200px}
+.note{font-size:.85rem}
+.skel{display:inline-block;min-width:3ch;background:linear-gradient(90deg,#101612,#1a2620,#101612);background-size:200% 100%;animation:sh 1.2s infinite;border-radius:6px;color:transparent}
+@keyframes sh{to{background-position:-200% 0}}
+@media(max-width:760px){.top{grid-template-columns:1fr}}
+@media(max-width:520px){main{padding:16px}h1{font-size:1.5rem}.cmp,.mk{grid-template-columns:1fr 1fr}.mk>div:last-child{grid-column:1/-1}.v{font-size:1.25rem}.gval{font-size:2.6rem}}
+@media(prefers-reduced-motion:reduce){.skel{animation:none}}
+</style>
+</head>
+<body>
+<main>
+<h1>😱🤑 Crypto Fear &amp; Greed</h1>
+<p class="muted">Today's market mood from the Fear &amp; Greed Index, its 90-day history, and the global market snapshot. Live data, fetched straight from your browser.</p>
+<div class="row"><button id="reload">↻ Refresh</button><span id="upd" class="pill">loading…</span></div>
+<div id="st" class="muted status" role="status" aria-live="polite">Loading index and market data…</div>
+
+<div class="top">
+ <div class="card gwrap">
+  <h2>Today</h2>
+  <canvas id="gauge" width="440" height="253" role="img" aria-label="Fear and Greed gauge"></canvas>
+  <div class="gval num" id="gv"><span class="skel">00</span></div>
+  <div class="glbl" id="gl">&nbsp;</div>
+  <div class="muted note" id="gnext">&nbsp;</div>
+ </div>
+ <div class="card">
+  <h2>Compared to</h2>
+  <div class="cmp">
+   <div><div class="k">Yesterday</div><div class="v num" id="c1"><span class="skel">00</span></div><div class="d" id="c1l">&nbsp;</div><div class="d num" id="c1d">&nbsp;</div></div>
+   <div><div class="k">Last week</div><div class="v num" id="c7"><span class="skel">00</span></div><div class="d" id="c7l">&nbsp;</div><div class="d num" id="c7d">&nbsp;</div></div>
+   <div><div class="k">Last month</div><div class="v num" id="c30"><span class="skel">00</span></div><div class="d" id="c30l">&nbsp;</div><div class="d num" id="c30d">&nbsp;</div></div>
+  </div>
+  <h2 style="margin-top:16px">Global market</h2>
+  <div class="mk">
+   <div><div class="k">BTC dominance</div><div class="v num" id="dom"><span class="skel">00.0%</span></div></div>
+   <div><div class="k">Total mkt cap</div><div class="v num" id="mcap"><span class="skel">$0.00T</span></div></div>
+   <div><div class="k">24h change</div><div class="v num" id="mch"><span class="skel">+0.0%</span></div></div>
+  </div>
+  <div id="mkerr" class="err note"></div>
+ </div>
+</div>
+
+<div class="card">
+ <div class="row" style="justify-content:space-between"><h2 style="margin:0">90-day history</h2><span class="muted note" id="hrange">&nbsp;</span></div>
+ <div style="position:relative;margin-top:10px"><canvas id="hist" aria-label="90-day Fear and Greed history chart" role="img"></canvas><div class="tip mono" id="tip"></div></div>
+ <div class="row muted note" style="margin-top:8px;gap:14px">
+  <span><b style="color:#ff5d7a">●</b> 0–24 Extreme Fear</span><span><b style="color:#ff9f5d">●</b> 25–44 Fear</span><span><b style="color:#e8e05d">●</b> 45–54 Neutral</span><span><b style="color:#9bff5d">●</b> 55–75 Greed</span><span><b style="color:#5dffb0">●</b> 76–100 Extreme Greed</span>
+ </div>
+</div>
+
+<div class="card">
+ <h2>🐦 Share the mood</h2>
+ <div class="row"><div class="tweet mono" id="tw">Waiting for data…</div><button id="copy" disabled>Copy tweet</button><button id="post" class="ghost" disabled>Open in X</button></div>
+ <div id="cst" class="muted note status" aria-live="polite"></div>
+</div>
+
+<div class="card note muted">
+ <b>Data sources:</b> Fear &amp; Greed Index by <a href="https://alternative.me/crypto/fear-and-greed-index/" target="_blank" rel="noopener">alternative.me</a> (<span class="mono">api.alternative.me/fng</span>) · Global market data by <a href="https://www.coingecko.com/" target="_blank" rel="noopener">CoinGecko</a> (<span class="mono">/api/v3/global</span>). The index updates once a day; market data is near real-time and may be rate-limited.<br>
+ <b>Not financial advice.</b> Sentiment indicators are a rough mood ring, not a trading signal. Do your own research.
+</div>
+
+<div class="card capture">
+ <h2>📬 Get new free tools + alpha drops</h2>
+ <p class="muted note" style="margin-top:0">New free crypto tools as they ship. No spam, unsubscribe any time.</p>
+ <form id="capture" action="https://formspree.io/f/YOUR_FORMSPREE_ID" method="POST">
+  <div class="row">
+   <input type="email" name="email" required placeholder="you@example.com" aria-label="Email address" autocomplete="email">
+   <input type="hidden" name="tool" value="fear-greed">
+   <button type="submit">Subscribe</button>
+  </div>
+  <div id="fst" class="note status" aria-live="polite"></div>
+ </form>
+</div>
+</main>
+
+<footer>
+ <a href="./">← all free tools</a> · made by <a href="https://anonymusk7.github.io/anonymusk/">anonymusk</a> · want studio-grade launch videos? <a href="https://anonymusk.gumroad.com/l/sztuha">Motion pack $29</a> / <a href="https://anonymusk.gumroad.com/l/ksgvlu">Launch kit $79</a>
+ <div style="margin-top:6px">anonymusk tools</div>
+</footer>
+
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const FNG_URL='https://api.alternative.me/fng/?limit=90';
+const CG_URL='https://api.coingecko.com/api/v3/global';
+const SLUG='fear-greed';
+let FNG=null,MK=null,gaugeAnim=null;
+
+function zone(v){
+ if(v<25)return{c:'#ff5d7a',n:'Extreme Fear'};
+ if(v<45)return{c:'#ff9f5d',n:'Fear'};
+ if(v<55)return{c:'#e8e05d',n:'Neutral'};
+ if(v<=75)return{c:'#9bff5d',n:'Greed'};
+ return{c:'#5dffb0',n:'Extreme Greed'};
+}
+function ease(t){t=Math.max(0,Math.min(1,t));return 1-Math.pow(1-t,3)}
+function money(n){if(n==null||!isFinite(n))return'—';const a=Math.abs(n);
+ return '$'+(a>=1e12?(n/1e12).toFixed(2)+'T':a>=1e9?(n/1e9).toFixed(2)+'B':a>=1e6?(n/1e6).toFixed(2)+'M':n.toFixed(0))}
+function pct(n,d){return n==null||!isFinite(n)?'—':(n>0?'+':'')+n.toFixed(d==null?2:d)+'%'}
+function cls(n){return n>0?'up':n<0?'dn':'flat'}
+function dateOf(ts){return new Date(ts*1000)}
+function fmtDate(d){return d.toLocaleDateString(undefined,{month:'short',day:'numeric'})}
+
+async function getJSON(url,ms){
+ const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),ms||12000);
+ try{const r=await fetch(url,{signal:ctl.signal,headers:{Accept:'application/json'}});
+  if(!r.ok)throw new Error(r.status===429?'rate limited (429), try again in a minute':'HTTP '+r.status);
+  return await r.json()}
+ catch(e){throw new Error(e.name==='AbortError'?'request timed out':e.message)}
+ finally{clearTimeout(t)}
+}
+
+/* ---------- gauge ---------- */
+function setupCanvas(cv,w,h){const dpr=Math.min(window.devicePixelRatio||1,3);cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);const c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);return c}
+function drawGauge(val){
+ const cv=$('gauge'),w=cv.clientWidth||440,h=w*1.15/2,c=setupCanvas(cv,w,h);
+ const cx=w/2,cy=h*0.9,R=Math.min(w/2-14,h*0.82),th=Math.max(14,R*0.16);
+ c.clearRect(0,0,w,h);
+ // track segments
+ const segs=[[0,25,'#ff5d7a'],[25,45,'#ff9f5d'],[45,56,'#e8e05d'],[56,76,'#9bff5d'],[76,100,'#5dffb0']];
+ c.lineCap='butt';
+ segs.forEach(([a,b,col])=>{c.beginPath();c.strokeStyle=col;c.globalAlpha=.22;c.lineWidth=th;
+  c.arc(cx,cy,R,Math.PI+a/100*Math.PI+.01,Math.PI+b/100*Math.PI-.01);c.stroke()});
+ c.globalAlpha=1;
+ if(val!=null){
+  // filled arc to current value
+  const g=c.createLinearGradient(cx-R,0,cx+R,0);
+  g.addColorStop(0,'#ff5d7a');g.addColorStop(.35,'#ff9f5d');g.addColorStop(.5,'#e8e05d');g.addColorStop(.68,'#9bff5d');g.addColorStop(1,'#5dffb0');
+  c.beginPath();c.strokeStyle=g;c.lineWidth=th;c.lineCap='round';
+  c.shadowColor=zone(val).c;c.shadowBlur=18;
+  c.arc(cx,cy,R,Math.PI,Math.PI+Math.max(.002,val/100)*Math.PI);c.stroke();c.shadowBlur=0;
+ }
+ // ticks
+ c.fillStyle='#7a8a80';c.font='12px ui-monospace,Menlo,monospace';c.textAlign='center';c.textBaseline='middle';
+ [0,25,50,75,100].forEach(t=>{const a=Math.PI+t/100*Math.PI,r=R-th/2-14;c.fillText(t,cx+Math.cos(a)*r,cy+Math.sin(a)*r)});
+ if(val!=null){
+  // needle
+  const a=Math.PI+val/100*Math.PI,len=R-th/2-24;
+  c.strokeStyle='#e8f0ea';c.lineWidth=3;c.lineCap='round';
+  c.beginPath();c.moveTo(cx,cy);c.lineTo(cx+Math.cos(a)*len,cy+Math.sin(a)*len);c.stroke();
+  c.beginPath();c.fillStyle='#7a8cff';c.arc(cx,cy,7,0,Math.PI*2);c.fill();
+  c.beginPath();c.fillStyle='#07090c';c.arc(cx,cy,3,0,Math.PI*2);c.fill();
+ }
+}
+function animateGauge(target){
+ if(gaugeAnim)cancelAnimationFrame(gaugeAnim);
+ const reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const t0=performance.now(),dur=reduce?1:1600,z=zone(target);
+ $('gl').textContent=z.n;$('gl').style.color=z.c;$('gv').style.color=z.c;
+ (function f(now){const p=ease((now-t0)/dur),v=target*p;
+  // small overshoot wobble on the needle for feel
+  const wob=reduce?0:Math.sin(p*Math.PI*3)*(1-p)*4;
+  drawGauge(Math.max(0,Math.min(100,v+wob)));$('gv').textContent=Math.round(v);
+  if(p<1)gaugeAnim=requestAnimationFrame(f);else{drawGauge(target);$('gv').textContent=target}
+ })(t0);
+}
+
+/* ---------- history chart ---------- */
+let histPts=[];
+function drawHist(hover){
+ const cv=$('hist'),w=cv.clientWidth,h=cv.clientHeight,c=setupCanvas(cv,w,h);
+ c.clearRect(0,0,w,h);
+ const pl=34,pr=12,pt=14,pb=26,iw=w-pl-pr,ih=h-pt-pb;
+ // zone bands
+ [[0,25,'#ff5d7a'],[25,45,'#ff9f5d'],[45,56,'#e8e05d'],[56,76,'#9bff5d'],[76,100,'#5dffb0']].forEach(([a,b,col])=>{
+  c.fillStyle=col;c.globalAlpha=.05;c.fillRect(pl,pt+ih*(1-b/100),iw,ih*(b-a)/100)});
+ c.globalAlpha=1;
+ c.strokeStyle='#1d2a22';c.lineWidth=1;c.fillStyle='#7a8a80';c.font='11px ui-monospace,Menlo,monospace';c.textAlign='right';c.textBaseline='middle';
+ [0,25,50,75,100].forEach(v=>{const y=pt+ih*(1-v/100);c.beginPath();c.moveTo(pl,y+.5);c.lineTo(w-pr,y+.5);c.stroke();c.fillText(v,pl-6,y)});
+ if(!FNG||FNG.length<2){histPts=[];return}
+ const d=FNG.slice().reverse(),n=d.length;
+ histPts=d.map((p,i)=>({x:pl+(n===1?iw/2:i/(n-1)*iw),y:pt+ih*(1-p.value/100),v:p.value,t:p.ts,l:p.label}));
+ // area
+ const ag=c.createLinearGradient(0,pt,0,pt+ih);ag.addColorStop(0,'rgba(93,255,176,.22)');ag.addColorStop(1,'rgba(122,140,255,.02)');
+ c.beginPath();c.moveTo(histPts[0].x,pt+ih);histPts.forEach(p=>c.lineTo(p.x,p.y));c.lineTo(histPts[n-1].x,pt+ih);c.closePath();c.fillStyle=ag;c.fill();
+ // line, coloured per segment by zone
+ c.lineWidth=2.2;c.lineJoin='round';c.lineCap='round';
+ for(let i=1;i<n;i++){const a=histPts[i-1],b=histPts[i];c.strokeStyle=zone((a.v+b.v)/2).c;c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke()}
+ // x labels
+ c.fillStyle='#7a8a80';c.textAlign='center';c.textBaseline='top';
+ const step=Math.max(1,Math.round(n/(w<520?3:6)));
+ for(let i=0;i<n;i+=step)c.fillText(fmtDate(dateOf(histPts[i].t)),histPts[i].x,pt+ih+8);
+ // last point
+ const L=histPts[n-1];c.beginPath();c.fillStyle=zone(L.v).c;c.arc(L.x,L.y,4,0,Math.PI*2);c.fill();
+ // hover
+ const tip=$('tip');
+ if(hover!=null){const p=histPts[hover];c.strokeStyle='rgba(232,240,234,.35)';c.setLineDash([3,3]);c.beginPath();c.moveTo(p.x+.5,pt);c.lineTo(p.x+.5,pt+ih);c.stroke();c.setLineDash([]);
+  c.beginPath();c.fillStyle=zone(p.v).c;c.arc(p.x,p.y,5,0,Math.PI*2);c.fill();
+  tip.style.display='block';tip.style.left=Math.max(60,Math.min(w-60,p.x))+'px';tip.style.top=Math.max(40,p.y)+'px';
+  tip.textContent=fmtDate(dateOf(p.t))+' · '+p.v+' '+p.l}
+ else tip.style.display='none';
+}
+function hoverAt(clientX){if(!histPts.length)return;const r=$('hist').getBoundingClientRect(),x=clientX-r.left;let bi=0,bd=1e9;histPts.forEach((p,i)=>{const dd=Math.abs(p.x-x);if(dd<bd){bd=dd;bi=i}});drawHist(bi)}
+$('hist').addEventListener('mousemove',e=>hoverAt(e.clientX));
+$('hist').addEventListener('mouseleave',()=>drawHist(null));
+$('hist').addEventListener('touchstart',e=>{if(e.touches[0])hoverAt(e.touches[0].clientX)},{passive:true});
+$('hist').addEventListener('touchmove',e=>{if(e.touches[0])hoverAt(e.touches[0].clientX)},{passive:true});
+$('hist').addEventListener('touchend',()=>setTimeout(()=>drawHist(null),1500));
+
+/* ---------- render ---------- */
+function setCmp(id,idx){
+ const el=$(id),lb=$(id+'l'),dl=$(id+'d');
+ if(!FNG||!FNG[idx]){el.textContent='—';lb.textContent='no data';dl.textContent='';return}
+ const p=FNG[idx],z=zone(p.value),diff=FNG[0].value-p.value;
+ el.textContent=p.value;el.style.color=z.c;lb.textContent=p.label;lb.style.color=z.c;
+ dl.textContent=diff===0?'unchanged':(diff>0?'▲ ':'▼ ')+Math.abs(diff)+' pts since';dl.className='d num '+cls(diff);
+}
+function renderFng(){
+ const t=FNG[0];animateGauge(t.value);if(t.label){$('gl').textContent=t.label}
+ const until=parseInt(t.until,10);
+ $('gnext').textContent=fmtDate(dateOf(t.ts))+(until>0?' · next update in ~'+(until>=3600?Math.round(until/3600)+'h':Math.max(1,Math.round(until/60))+'m'):'');
+ setCmp('c1',1);setCmp('c7',7);setCmp('c30',30);
+ const last=FNG[FNG.length-1];
+ const vals=FNG.map(p=>p.value),avg=vals.reduce((a,b)=>a+b,0)/vals.length;
+ $('hrange').textContent=fmtDate(dateOf(last.ts))+' → '+fmtDate(dateOf(t.ts))+' · avg '+avg.toFixed(0)+' · low '+Math.min(...vals)+' · high '+Math.max(...vals);
+ drawHist(null);
+}
+function renderMk(){
+ $('dom').textContent=MK.dom!=null?MK.dom.toFixed(1)+'%':'—';
+ $('mcap').textContent=money(MK.cap);
+ $('mch').textContent=pct(MK.ch);$('mch').className='v num '+cls(MK.ch);
+}
+function mkFail(msg){['dom','mcap','mch'].forEach(id=>$(id).textContent='—');$('mkerr').textContent='CoginGecko unavailable: '.replace('Cogin','Coin')+msg}
+function fngFail(msg){$('gv').textContent='—';$('gl').textContent='unavailable';$('gl').style.color='#ff8a9e';drawGauge(null);
+ ['c1','c7','c30'].forEach(id=>{$(id).textContent='—';$(id+'l').textContent='';$(id+'d').textContent=''});$('hrange').textContent='';FNG=null;drawHist(null)}
+
+function tweetText(){
+ const parts=[];
+ if(FNG){const t=FNG[0],y=FNG[1];let s='Crypto mood: '+t.label+' ('+t.value+'/100)';
+  if(y){const d=t.value-y.value;s+=d===0?', flat vs yesterday':', '+(d>0?'up ':'down ')+Math.abs(d)+' vs yesterday'}
+  if(FNG[30])s+=', '+FNG[30].value+' a month ago';parts.push(s)}
+ if(MK){if(MK.dom!=null)parts.push('BTC dom '+MK.dom.toFixed(1)+'%');if(MK.cap!=null)parts.push('Total mcap '+money(MK.cap)+(MK.ch!=null?' ('+pct(MK.ch,1)+' 24h)':''))}
+ if(!parts.length)return'';
+ return parts.join(' · ')+' 📊 #crypto';
+}
+function updateTweet(){const t=tweetText();$('tw').textContent=t||'No data available to summarize yet.';$('copy').disabled=!t;$('post').disabled=!t}
+
+async function copyText(t){
+ if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(t);return}
+ const ta=document.createElement('textarea');ta.value=t;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
+ const ok=document.execCommand('copy');document.body.removeChild(ta);if(!ok)throw new Error('copy blocked')
+}
+$('copy').addEventListener('click',async()=>{const t=tweetText();if(!t)return;
+ try{await copyText(t);$('cst').textContent='✓ Copied to clipboard.';$('cst').className='note status up'}
+ catch(e){$('cst').textContent='Could not copy automatically. Select the text above and copy it manually.';$('cst').className='note status err'}});
+$('post').addEventListener('click',()=>{const t=tweetText();if(t)window.open('https://x.com/intent/tweet?text='+encodeURIComponent(t),'_blank','noopener')});
+
+async function loadAll(){
+ $('reload').disabled=true;$('st').textContent='Loading index and market data…';$('st').className='muted status';$('mkerr').textContent='';
+ const errs=[];
+ const pF=getJSON(FNG_URL).then(j=>{
+  if(!j||!Array.isArray(j.data)||!j.data.length)throw new Error((j&&j.metadata&&j.metadata.error)||'empty response');
+  FNG=j.data.map(p=>({value:parseInt(p.value,10),label:p.value_classification,ts:parseInt(p.timestamp,10),until:p.time_until_update})).filter(p=>isFinite(p.value)&&isFinite(p.ts));
+  if(!FNG.length)throw new Error('no valid points');
+  FNG.sort((a,b)=>b.ts-a.ts);renderFng();
+ }).catch(e=>{errs.push('Fear & Greed: '+e.message);fngFail(e.message)});
+ const pM=getJSON(CG_URL).then(j=>{
+  const d=j&&j.data;if(!d)throw new Error('empty response');
+  MK={dom:d.market_cap_percentage&&d.market_cap_percentage.btc,cap:d.total_market_cap&&d.total_market_cap.usd,ch:d.market_cap_change_percentage_24h_usd};
+  renderMk();
+ }).catch(e=>{MK=null;errs.push('CoinGecko: '+e.message);mkFail(e.message)});
+ await Promise.all([pF,pM]);
+ updateTweet();
+ $('upd').textContent='updated '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+ if(errs.length){$('st').textContent='Some data failed to load: '+errs.join(' · ')+'. Hit Refresh to retry.';$('st').className='err status'}
+ else $('st').textContent='';
+ $('reload').disabled=false;
+}
+$('reload').addEventListener('click',loadAll);
+
+let rz;window.addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{if(FNG){if(gaugeAnim)cancelAnimationFrame(gaugeAnim);drawGauge(FNG[0].value);$('gv').textContent=FNG[0].value}else drawGauge(null);drawHist(null)},120)});
+
+drawGauge(null);drawHist(null);loadAll();
+
+/* ---------- email capture ---------- */
+const form=$('capture'),fst=$('fst');
+form.addEventListener('submit',async e=>{
+ const email=form.email.value.trim();
+ if(form.action.indexOf('YOUR_FORMSPREE_ID')!==-1){
+  e.preventDefault();
+  location.href='mailto:anonymusk@mail.grokbot.com?subject='+encodeURIComponent('Subscribe: '+SLUG)+'&body='+encodeURIComponent('Please add '+email+' to the anonymusk free-tools list.');
+  fst.textContent='Opening your email app to send the subscribe request…';fst.className='note status muted';
+  return;
+ }
+ e.preventDefault();
+ const btn=form.querySelector('button[type=submit]');btn.disabled=true;fst.textContent='Sending…';fst.className='note status muted';
+ try{
+  const r=await fetch(form.action,{method:'POST',body:new FormData(form),headers:{Accept:'application/json'}});
+  if(r.ok){form.reset();fst.textContent='✓ Thanks! You\'re on the list. Watch your inbox for new tools.';fst.className='note status up'}
+  else{let m='HTTP '+r.status;try{const j=await r.json();if(j&&j.errors)m=j.errors.map(x=>x.message).join(', ')}catch(_){}
+   fst.textContent='Signup failed: '+m+'. Please try again.';fst.className='note status err'}
+ }catch(err){fst.textContent='Network error, could not subscribe. Please try again.';fst.className='note status err'}
+ finally{btn.disabled=false}
+});
+})();
+</script>
+</body>
+</html>

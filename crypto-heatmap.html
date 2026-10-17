@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crypto market heatmap: top 100 coins treemap | anonymusk</title>
+<meta name="description" content="Free live crypto market heatmap. Squarified treemap of the top 100 coins by market cap, colored by 1h, 24h or 7d % change. Hide stablecoins, hover for price, market cap and volume. Data from CoinGecko, runs in your browser.">
+<meta property="og:title" content="Crypto market heatmap: top 100 coins treemap | anonymusk">
+<meta property="og:description" content="Live treemap of the top 100 coins. Tile size = market cap, color = % change. 1h / 24h / 7d.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#07090c">
+<style>
+body{margin:0;background:#07090c;color:#e8f0ea;font:16px/1.5 Inter,system-ui,sans-serif}
+main{max-width:1200px;margin:auto;padding:24px}
+h1{font-size:2rem;margin:.2em 0}
+h2{font-size:1.3rem;margin:.1em 0 .4em}
+a{color:#5dffb0}
+code,.num{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+input,select,button{font:inherit;padding:10px 14px;border-radius:10px;border:1px solid #2a3a30;background:#101612;color:#e8f0ea}
+button{background:#5dffb0;color:#04130b;font-weight:800;cursor:pointer;border:0}
+button:disabled{opacity:.5;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.card{background:#0e1411;border:1px solid #1d2a22;border-radius:14px;padding:16px;margin:10px 0}
+.pro{border-color:#2b5a40;background:linear-gradient(135deg,#0c1712,#0e1020)}
+.muted{color:#7a8a80}
+.acc{color:#5dffb0}
+.seg{display:inline-flex;border:1px solid #2a3a30;border-radius:10px;overflow:hidden}
+.seg button{background:#101612;color:#9fb;border-radius:0;font-weight:700;padding:8px 14px}
+.seg button+button{border-left:1px solid #2a3a30}
+.seg button[aria-pressed=true]{background:linear-gradient(90deg,#5dffb0,#7a8cff);color:#04130b}
+.chk{display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none;padding:8px 12px;border:1px solid #2a3a30;border-radius:10px;background:#101612}
+.chk input{accent-color:#5dffb0;width:16px;height:16px;margin:0;padding:0}
+.btn2{background:#101612;color:#5dffb0;border:1px solid #2a3a30;padding:8px 14px}
+.pill{font-size:.8rem;padding:4px 10px;border-radius:99px;border:1px solid #2a3a30;color:#9fb}
+.pill.live{border-color:#5dffb0;color:#5dffb0}
+.pill.err{border-color:#ff5d7a;color:#ff8a9e}
+#wrap{position:relative;margin:14px 0 8px}
+#map{position:relative;width:100%;height:560px;border-radius:14px;overflow:hidden;background:#000;border:1px solid #1d2a22;touch-action:manipulation}
+.t{position:absolute;box-sizing:border-box;border:1px solid #07090c;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff;cursor:pointer;line-height:1.1;transition:background-color .4s,filter .15s}
+.t:hover,.t.sel{filter:brightness(1.25);z-index:2;outline:2px solid #e8f0ea;outline-offset:-2px}
+.t .s{font-weight:800;letter-spacing:.02em;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.t .p{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;opacity:.95;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.t .v{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;opacity:.7;font-size:.8em}
+#ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(7,9,12,.85);border-radius:14px;z-index:5;text-align:center;padding:20px}
+#ov[hidden]{display:none}
+.spin{width:34px;height:34px;border:3px solid #1d2a22;border-top-color:#5dffb0;border-right-color:#7a8cff;border-radius:50%;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+#tip{position:fixed;z-index:20;pointer-events:none;min-width:200px;max-width:280px;background:#0b100dee;border:1px solid #2b5a40;border-radius:12px;padding:10px 12px;font-size:.88rem;box-shadow:0 8px 30px rgba(0,0,0,.6),0 0 0 1px rgba(122,140,255,.15)}
+#tip[hidden]{display:none}
+#tip .h{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+#tip img{width:22px;height:22px;border-radius:50%}
+#tip b{font-size:1rem}
+#tip table{width:100%;border-collapse:collapse}
+#tip td{padding:1px 0}
+#tip td:last-child{text-align:right;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.up{color:#5dffb0}.dn{color:#ff5d7a}
+.legend{display:flex;align-items:center;gap:8px;font-size:.8rem;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#9fb}
+.legend .bar{width:180px;height:10px;border-radius:99px;border:1px solid #1d2a22}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.stats>div{background:#0a0f0c;border:1px solid #1d2a22;border-radius:12px;padding:8px 12px}
+.stats .k{font-size:.75rem;color:#7a8a80;text-transform:uppercase;letter-spacing:.06em}
+.stats .num{font-size:1.05rem}
+#capture input[type=email]{flex:1;min-width:220px}
+#cmsg{min-height:1.4em;margin-top:8px}
+footer{text-align:center;padding:30px;color:#7a8a80;font-size:.9rem}
+footer .brand{display:block;margin-top:6px;letter-spacing:.12em;text-transform:uppercase;font-size:.75rem;color:#4f5f55}
+@media(max-width:600px){main{padding:14px}h1{font-size:1.5rem}.legend .bar{width:110px}}
+</style>
+</head>
+<body>
+<main>
+<h1>🟩🟥 Crypto market heatmap</h1>
+<p class="muted">Top 100 coins by market cap. Tile size = market cap, color = % price change. Hover (or tap) a tile for details. Refreshes every 120s.</p>
+
+<div class="row">
+ <div class="seg" role="group" aria-label="Change window">
+  <button type="button" data-w="1h" aria-pressed="false">1h</button>
+  <button type="button" data-w="24h" aria-pressed="true">24h</button>
+  <button type="button" data-w="7d" aria-pressed="false">7d</button>
+ </div>
+ <label class="chk"><input type="checkbox" id="nostable" checked> Exclude stablecoins</label>
+ <button type="button" class="btn2" id="refresh">↻ Refresh</button>
+ <span id="status" class="pill">loading…</span>
+</div>
+
+<div id="wrap">
+ <div id="map" aria-label="Crypto market treemap"></div>
+ <div id="ov"><div class="spin"></div><div id="ovmsg" class="muted">Loading top 100 coins from CoinGecko…</div></div>
+</div>
+<div class="row" style="justify-content:space-between">
+ <div class="legend"><span id="lmin" class="dn">-8%</span><span class="bar" id="lbar"></span><span id="lmax" class="up">+8%</span></div>
+ <span class="muted" style="font-size:.85rem">Updated <span id="upd" class="num">—</span> · next in <span id="cd" class="num">—</span></span>
+</div>
+
+<div class="card">
+ <div class="stats">
+  <div><div class="k">Coins shown</div><div class="num" id="sN">—</div></div>
+  <div><div class="k">Total mcap shown</div><div class="num" id="sM">—</div></div>
+  <div><div class="k">24h volume shown</div><div class="num" id="sV">—</div></div>
+  <div><div class="k">Up / down (<span id="sW">24h</span>)</div><div class="num" id="sUD">—</div></div>
+  <div><div class="k">Mcap-weighted chg</div><div class="num" id="sA">—</div></div>
+ </div>
+</div>
+
+<p class="muted" style="font-size:.85rem">Data source: <a href="https://www.coingecko.com/" target="_blank" rel="noopener">CoinGecko</a> public API (<code>/api/v3/coins/markets</code>), fetched directly from your browser. The free API is rate limited; if a refresh fails the last good data stays on screen. <b>Not financial advice.</b> Prices can be delayed or inaccurate; do your own research.</p>
+
+<div class="card pro">
+ <h2>📬 Get new free tools + alpha drops</h2>
+ <p class="muted" style="margin-top:0">New browser-only crypto tools as they ship. No spam, unsubscribe anytime.</p>
+ <form id="capture" action="https://formspree.io/f/YOUR_FORMSPREE_ID" method="POST" class="row">
+  <input type="email" name="email" required placeholder="you@example.com" autocomplete="email" aria-label="Email address">
+  <input type="hidden" name="tool" value="crypto-heatmap">
+  <button type="submit">Subscribe</button>
+ </form>
+ <div id="cmsg" class="muted" role="status"></div>
+</div>
+</main>
+
+<div id="tip" hidden></div>
+
+<footer>
+ <a href="./">← all free tools</a> · made by <a href="https://anonymusk7.github.io/anonymusk/">anonymusk</a> · want studio-grade launch videos? <a href="https://anonymusk.gumroad.com/l/sztuha">Motion pack $29</a> / <a href="https://anonymusk.gumroad.com/l/ksgvlu">Launch kit $79</a>
+ <span class="brand">anonymusk tools</span>
+</footer>
+
+<script>
+(function(){
+const API='https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=1h,24h,7d';
+const REFRESH=120;
+const RANGE={'1h':3,'24h':8,'7d':20};
+const KEY={'1h':'price_change_percentage_1h_in_currency','24h':'price_change_percentage_24h_in_currency','7d':'price_change_percentage_7d_in_currency'};
+// Known USD-pegged stablecoins (CoinGecko ids), plus a heuristic fallback below.
+const STABLE=new Set(['tether','usd-coin','dai','first-digital-usd','ethena-usde','usds','paypal-usd','true-usd','frax','usdd','binance-usd','gemini-dollar','pax-dollar','paxos-standard','liquity-usd','crvusd','gho','usual-usd','ripple-usd','falcon-finance','usdx-money-usdx','global-dollar','resolv-usr','ethena-staked-usde','sky-dollar','agora-dollar','eurc','stasis-eurs','tether-eurt','usdb','susds','elixir-deusd','usd1-wlfi','world-liberty-financial-usd','bfusd','usdtb','ondo-us-dollar-yield','lusd','mountain-protocol-usdm','frax-usd']);
+const STABLE_SYM=/^(usdt|usdc|dai|fdusd|usde|usds|pyusd|tusd|frax|frxusd|usdd|busd|gusd|usdp|lusd|crvusd|gho|usd0|rlusd|usdx|usr|susde|susds|usd1|bfusd|usdtb|usdy|usdm|usdb|deusd|eurc|eurs|eurt|usdf|usdg|usda|dola|mim|alusd|susd)$/i;
+
+const $=id=>document.getElementById(id);
+const map=$('map'),ov=$('ov'),ovmsg=$('ovmsg'),tip=$('tip'),statusEl=$('status');
+let coins=null,win='24h',noStable=true,lastAt=0,next=REFRESH,loading=false,selId=null,tiles=[];
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function big(n){if(n==null||!isFinite(n))return'—';const a=Math.abs(n);return a>=1e12?'$'+(n/1e12).toFixed(2)+'T':a>=1e9?'$'+(n/1e9).toFixed(2)+'B':a>=1e6?'$'+(n/1e6).toFixed(2)+'M':a>=1e3?'$'+(n/1e3).toFixed(1)+'K':'$'+n.toFixed(2)}
+function price(n){if(n==null||!isFinite(n))return'—';if(n>=1000)return'$'+n.toLocaleString('en-US',{maximumFractionDigits:2});if(n>=1)return'$'+n.toFixed(n>=100?2:3);if(n===0)return'$0';return'$'+n.toPrecision(4)}
+function pct(n){if(n==null||!isFinite(n))return'—';return(n>=0?'+':'')+n.toFixed(2)+'%'}
+function isStable(c){
+ if(STABLE.has(c.id))return true;
+ const p=c.current_price,d=Math.abs(c.price_change_percentage_24h_in_currency??c.price_change_percentage_24h??99);
+ // heuristic: dollar-ish symbol trading near $1 with tiny 24h move
+ return /usd/i.test(c.symbol)&&p>0.97&&p<1.03&&d<1.5 || (STABLE_SYM.test(c.symbol)&&p>0.9&&p<1.25);
+}
+
+// Diverging color: red (#ff3d5e) ← neutral (#1b2220) → green (#14d47a), clamped to ±range
+const NEG=[255,61,94],MID=[27,34,32],POS=[20,212,122];
+function mix(a,b,t){return a.map((v,i)=>Math.round(v+(b[i]-v)*t))}
+function color(v,r){if(v==null||!isFinite(v))return'rgb(40,44,52)';let t=Math.max(-1,Math.min(1,v/r));t=Math.sign(t)*Math.pow(Math.abs(t),.75);const c=t<0?mix(MID,NEG,-t):mix(MID,POS,t);return`rgb(${c})`}
+
+// Squarified treemap (Bruls, Huizing, van Wijk). items: [{v,...}] sorted desc. Returns [{x,y,w,h,item}]
+function squarify(items,X,Y,W,H){
+ const out=[],total=items.reduce((s,i)=>s+i.v,0);if(!total||W<=0||H<=0)return out;
+ const scale=W*H/total,a=items.map(i=>i.v*scale);
+ let x=X,y=Y,w=W,h=H,i=0;
+ function worst(s,mn,mx,side){const s2=s*s,l2=side*side;return Math.max(l2*mx/s2,s2/(l2*mn))}
+ while(i<a.length){
+  const side=Math.min(w,h);let s=a[i],mn=a[i],mx=a[i],j=i+1,cur=worst(s,mn,mx,side);
+  while(j<a.length){const ns=s+a[j],nmn=Math.min(mn,a[j]),nmx=Math.max(mx,a[j]),nw=worst(ns,nmn,nmx,side);if(nw>cur)break;s=ns;mn=nmn;mx=nmx;cur=nw;j++}
+  if(w>=h){const cw=s/h;let yy=y;for(let k=i;k<j;k++){const hh=a[k]/cw;out.push({x,y:yy,w:cw,h:hh,item:items[k]});yy+=hh}x+=cw;w-=cw}
+  else{const rh=s/w;let xx=x;for(let k=i;k<j;k++){const ww=a[k]/rh;out.push({x:xx,y,w:ww,h:rh,item:items[k]});xx+=ww}y+=rh;h-=rh}
+  i=j;
+ }
+ return out;
+}
+
+function visible(){if(!coins)return[];return coins.filter(c=>c.market_cap>0&&!(noStable&&isStable(c))).sort((a,b)=>b.market_cap-a.market_cap)}
+
+function sizeMap(){const w=map.clientWidth,vh=window.innerHeight;const h=w<600?Math.max(520,Math.min(w*1.55,vh*1.1)):Math.max(420,Math.min(w*.62,vh*.75));map.style.height=Math.round(h)+'px'}
+
+function render(){
+ sizeMap();
+ const list=visible(),W=map.clientWidth,H=map.clientHeight,r=RANGE[win],k=KEY[win];
+ const rects=squarify(list.map(c=>({v:c.market_cap,c})),0,0,W,H);
+ const frag=document.createDocumentFragment();tiles=[];
+ for(const R of rects){
+  const c=R.item.c,v=c[k],d=document.createElement('div');
+  d.className='t'+(c.id===selId?' sel':'');d.dataset.id=c.id;
+  d.style.cssText=`left:${R.x}px;top:${R.y}px;width:${R.w}px;height:${R.h}px;background-color:${color(v,r)}`;
+  const m=Math.min(R.w,R.h*1.6);
+  if(R.w>26&&R.h>16){
+   const fs=Math.max(9,Math.min(46,m/4.2));
+   let html=`<span class="s" style="font-size:${fs}px">${esc(c.symbol.toUpperCase())}</span>`;
+   if(R.h>fs*2.4&&R.w>40)html+=`<span class="p" style="font-size:${Math.max(9,fs*.55)}px">${pct(v)}</span>`;
+   if(R.h>fs*3.8&&R.w>90)html+=`<span class="v" style="font-size:${Math.max(9,fs*.55)}px">${price(c.current_price)}</span>`;
+   d.innerHTML=html;
+  }
+  d.title='';frag.appendChild(d);tiles.push(d);
+ }
+ map.replaceChildren(frag);
+ // legend
+ $('lmin').textContent='-'+r+'%';$('lmax').textContent='+'+r+'%';
+ $('lbar').style.background=`linear-gradient(90deg,${color(-r,r)},${color(-r/2,r)},${color(0,r)},${color(r/2,r)},${color(r,r)})`;
+ // stats
+ const tm=list.reduce((s,c)=>s+c.market_cap,0),tv=list.reduce((s,c)=>s+(c.total_volume||0),0);
+ let up=0,dn=0,wsum=0,wm=0;for(const c of list){const x=c[k];if(x==null||!isFinite(x))continue;x>=0?up++:dn++;wsum+=x*c.market_cap;wm+=c.market_cap}
+ $('sN').textContent=list.length;$('sM').textContent=big(tm);$('sV').textContent=big(tv);$('sW').textContent=win;
+ $('sUD').innerHTML=`<span class="up">${up}</span> / <span class="dn">${dn}</span>`;
+ const avg=wm?wsum/wm:null;$('sA').innerHTML=`<span class="${avg>=0?'up':'dn'}">${pct(avg)}</span>`;
+ if(selId&&!list.some(c=>c.id===selId))hideTip();
+}
+
+// Tooltip
+function coinById(id){return coins&&coins.find(c=>c.id===id)}
+function showTip(c,px,py){
+ const row=(l,v)=>`<tr><td class="muted">${l}</td><td class="${v==null?'':v>=0?'up':'dn'}">${pct(v)}</td></tr>`;
+ tip.innerHTML=`<div class="h">${c.image?`<img src="${esc(c.image)}" alt="" referrerpolicy="no-referrer">`:''}<b>${esc(c.name)}</b><span class="muted">${esc(c.symbol.toUpperCase())} · #${esc(c.market_cap_rank??'—')}</span></div>
+ <table><tr><td class="muted">Price</td><td>${price(c.current_price)}</td></tr>
+ <tr><td class="muted">Market cap</td><td>${big(c.market_cap)}</td></tr>
+ <tr><td class="muted">24h volume</td><td>${big(c.total_volume)}</td></tr>
+ ${row('1h',c.price_change_percentage_1h_in_currency)}${row('24h',c.price_change_percentage_24h_in_currency)}${row('7d',c.price_change_percentage_7d_in_currency)}</table>`;
+ tip.hidden=false;placeTip(px,py);
+}
+function placeTip(px,py){const r=tip.getBoundingClientRect(),vw=innerWidth,vh=innerHeight;let x=px+14,y=py+14;if(x+r.width>vw-8)x=px-r.width-14;if(x<8)x=8;if(y+r.height>vh-8)y=py-r.height-14;if(y<8)y=8;tip.style.left=x+'px';tip.style.top=y+'px'}
+function hideTip(){tip.hidden=true;selId=null;tiles.forEach(t=>t.classList.remove('sel'))}
+let hoverId=null;
+map.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')return;const t=e.target.closest('.t');if(!t){tip.hidden=true;hoverId=null;return}if(t.dataset.id!==hoverId){hoverId=t.dataset.id;const c=coinById(hoverId);if(c)showTip(c,e.clientX,e.clientY)}else placeTip(e.clientX,e.clientY)});
+map.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'&&!selId){tip.hidden=true;hoverId=null}});
+map.addEventListener('click',e=>{const t=e.target.closest('.t');if(!t)return;const id=t.dataset.id;if(selId===id){hideTip();return}tiles.forEach(x=>x.classList.toggle('sel',x===t));selId=id;const c=coinById(id);if(c)showTip(c,e.clientX,e.clientY)});
+document.addEventListener('click',e=>{if(selId&&!e.target.closest('#map'))hideTip()});
+window.addEventListener('scroll',()=>{if(!tip.hidden)hideTip()},{passive:true});
+
+// Data
+function setStatus(txt,cls){statusEl.textContent=txt;statusEl.className='pill'+(cls?' '+cls:'')}
+async function load(){
+ if(loading)return;loading=true;$('refresh').disabled=true;
+ if(!coins){ov.hidden=false;ovmsg.textContent='Loading top 100 coins from CoinGecko…';ov.querySelector('.spin').style.display=''}
+ setStatus('loading…');
+ try{
+  const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),20000);
+  let r;try{r=await fetch(API,{headers:{Accept:'application/json'},signal:ctl.signal})}finally{clearTimeout(to)}
+  if(r.status===429)throw new Error('CoinGecko rate limit hit (429). Wait a minute and retry.');
+  if(!r.ok)throw new Error('CoinGecko returned HTTP '+r.status);
+  const d=await r.json();
+  if(!Array.isArray(d)||!d.length)throw new Error('Unexpected response from CoinGecko');
+  coins=d.filter(c=>c&&c.id&&c.symbol);lastAt=Date.now();
+  ov.hidden=true;render();setStatus('● live','live');$('upd').textContent=new Date(lastAt).toLocaleTimeString();
+ }catch(e){
+  const msg=e.name==='AbortError'?'Request timed out':(e.message==='Failed to fetch'?'Network error or CoinGecko blocked the request (often rate limiting).':e.message);
+  if(coins){setStatus('refresh failed, showing last data','err')}
+  else{ov.hidden=false;ov.querySelector('.spin').style.display='none';ovmsg.innerHTML=`<b class="dn">Could not load market data.</b><br>${esc(msg)}<br><button type="button" id="retry" style="margin-top:10px">Retry</button>`;$('retry').onclick=()=>{next=REFRESH;load()};setStatus('error','err')}
+  console.warn('heatmap load failed:',e);
+ }finally{loading=false;$('refresh').disabled=false;next=REFRESH}
+}
+setInterval(()=>{if(loading)return;if(document.hidden)return;next--;$('cd').textContent=next+'s';if(next<=0)load()},1000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&lastAt&&Date.now()-lastAt>REFRESH*1000)load()});
+
+// Controls
+document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>{win=b.dataset.w;document.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed',x===b));if(coins)render();else{const r=RANGE[win];$('lmin').textContent='-'+r+'%';$('lmax').textContent='+'+r+'%'}}));
+$('nostable').addEventListener('change',e=>{noStable=e.target.checked;hideTip();if(coins)render()});
+$('refresh').addEventListener('click',()=>load());
+
+// Responsive re-layout
+let rz=0,lastW=0;
+const onResize=()=>{clearTimeout(rz);rz=setTimeout(()=>{if(map.clientWidth!==lastW){lastW=map.clientWidth;if(coins)render();else sizeMap()}},120)};
+if('ResizeObserver'in window)new ResizeObserver(onResize).observe(document.getElementById('wrap'));else window.addEventListener('resize',onResize);
+window.addEventListener('orientationchange',()=>{lastW=0;onResize()});
+
+sizeMap();
+$('lbar').style.background=`linear-gradient(90deg,${color(-8,8)},${color(0,8)},${color(8,8)})`;
+load();
+
+// Email capture
+const form=$('capture'),cmsg=$('cmsg');
+form.addEventListener('submit',async e=>{
+ const email=form.email.value.trim();
+ if(form.action.indexOf('YOUR_FORMSPREE_ID')!==-1){
+  e.preventDefault();
+  location.href='mailto:anonymusk@mail.grokbot.com?subject='+encodeURIComponent('Subscribe: crypto-heatmap')+'&body='+encodeURIComponent('Please add '+email+' to the anonymusk free-tools list.');
+  cmsg.className='muted';cmsg.textContent='Opening your email app. Hit send there to finish subscribing.';
+  return;
+ }
+ e.preventDefault();
+ const btn=form.querySelector('button');btn.disabled=true;cmsg.className='muted';cmsg.textContent='Sending…';
+ try{
+  const r=await fetch(form.action,{method:'POST',body:new FormData(form),headers:{Accept:'application/json'}});
+  if(r.ok){cmsg.className='acc';cmsg.textContent='✓ Thanks! You\'re on the list.';form.reset()}
+  else{let m='Subscription failed (HTTP '+r.status+').';try{const j=await r.json();if(j&&j.errors)m=j.errors.map(x=>x.message).join(', ')}catch(_){}cmsg.className='dn';cmsg.textContent=m+' Please try again.'}
+ }catch(err){cmsg.className='dn';cmsg.textContent='Network error, nothing was sent. Please try again.'}
+ finally{btn.disabled=false}
+});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>📈 DCA backtester: DCA vs lump-sum for any coin | anonymusk</title>
+<meta name="description" content="Free crypto DCA backtester. Pick any CoinGecko coin, amount and frequency, and compare dollar-cost averaging vs lump-sum over the last 365 days. Runs in your browser.">
+<meta property="og:title" content="DCA backtester: DCA vs lump-sum for any coin | anonymusk">
+<meta property="og:description" content="Compare dollar-cost averaging vs lump-sum on BTC, ETH, SOL, DOGE or any CoinGecko coin. Free, client-side, shareable.">
+<meta property="og:type" content="website">
+<style>
+body{margin:0;background:#07090c;color:#e8f0ea;font:16px/1.5 Inter,system-ui,sans-serif}
+main{max-width:1000px;margin:auto;padding:24px}
+h1{font-size:2rem;margin:.2em 0}
+h2{font-size:1.05rem;margin:0 0 10px;color:#cfe}
+a{color:#5dffb0}
+input,select,button{font:inherit;padding:10px 14px;border-radius:10px;border:1px solid #2a3a30;background:#101612;color:#e8f0ea}
+input:focus,select:focus{outline:2px solid #5dffb055;border-color:#5dffb0}
+button{background:#5dffb0;color:#04130b;font-weight:800;cursor:pointer;border:0}
+button:disabled{opacity:.5;cursor:default}
+button.ghost{background:#101612;color:#e8f0ea;border:1px solid #2a3a30;font-weight:600}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.card{background:#0e1411;border:1px solid #1d2a22;border-radius:14px;padding:16px;margin:10px 0}
+.muted{color:#7a8a80}
+.mono,.num{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums}
+footer{text-align:center;padding:30px;color:#7a8a80;font-size:.9rem}
+.form{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;align-items:end}
+.form label{display:flex;flex-direction:column;gap:6px;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:#8a9}
+.form input,.form select{width:100%;box-sizing:border-box}
+.presets{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 4px}
+.chip{font-size:.85rem;padding:5px 12px;border-radius:99px;border:1px solid #2a3a30;background:#0a0f0c;color:#9fb;cursor:pointer;font-weight:600}
+.chip.on{border-color:#5dffb0;color:#5dffb0;background:#0c1712}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.side{border-radius:14px;padding:16px;background:#0a0f0c;border:1px solid #1d2a22}
+.side.dca{border-color:#2b5a40;background:linear-gradient(135deg,#0c1712,#0a0f0c)}
+.side.lump{border-color:#3a2f66;background:linear-gradient(135deg,#120f22,#0a0f0c)}
+.side h3{margin:0 0 8px;font-size:1rem;display:flex;align-items:center;gap:8px}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px dashed #1d2a22;font-size:.95rem}
+.kv:last-child{border-bottom:0}
+.kv span:first-child{color:#8a9}
+.roi{font-size:2rem;font-weight:800;line-height:1.1;margin:4px 0 8px}
+.pos{color:#5dffb0}.neg{color:#ff5d7a}
+.verdict{font-weight:700;margin:12px 0 0}
+#chartWrap{position:relative}
+canvas{width:100%;height:340px;border-radius:14px;display:block;background:#05070a;border:1px solid #1d2a22}
+#tip{position:absolute;pointer-events:none;background:#0e1411ee;border:1px solid #2a3a30;border-radius:10px;padding:8px 10px;font-size:.8rem;display:none;white-space:nowrap;z-index:2}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.85rem;color:#9ab;margin-top:8px}
+.legend i{display:inline-block;width:18px;height:3px;vertical-align:middle;margin-right:6px;border-radius:2px}
+#st{min-height:1.5em;margin-top:10px}
+.err{color:#ff5d7a}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid #5dffb0;border-right-color:transparent;border-radius:50%;animation:sp .8s linear infinite;vertical-align:-1px;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.capture{border-color:#3a2f66;background:linear-gradient(135deg,#120f22,#0c1712)}
+.capture h2{font-size:1.2rem;margin:.1em 0 .3em;color:#e8f0ea}
+.capture input[type=email]{flex:1;min-width:220px}
+.btn-grad{background:linear-gradient(90deg,#5dffb0,#b18cff);color:#04130b}
+.note{font-size:.85rem}
+@media(max-width:760px){.form{grid-template-columns:1fr 1fr}.cmp{grid-template-columns:1fr}canvas{height:260px}h1{font-size:1.6rem}main{padding:16px}}
+</style>
+</head>
+<body>
+<main>
+<h1>📈 DCA backtester</h1>
+<p class="muted">Dollar-cost averaging vs. lump-sum on real daily prices. Pick a coin, an amount per buy and a schedule. The lump-sum side puts the same total in on day one.</p>
+
+<div class="card">
+ <div class="form">
+  <label>Coin (CoinGecko id)<input id="coin" value="bitcoin" autocomplete="off" spellcheck="false" placeholder="e.g. bitcoin"></label>
+  <label>USD per buy<input id="amt" type="number" min="1" step="1" value="100" inputmode="decimal"></label>
+  <label>Frequency<select id="freq"><option value="daily">Daily</option><option value="weekly" selected>Weekly</option><option value="monthly">Monthly</option></select></label>
+  <label>Period (days, max 365)<input id="days" type="number" min="7" max="365" step="1" value="365"></label>
+ </div>
+ <div class="presets" id="presets">
+  <button class="chip" data-id="bitcoin">BTC</button><button class="chip" data-id="ethereum">ETH</button><button class="chip" data-id="solana">SOL</button><button class="chip" data-id="dogecoin">DOGE</button>
+ </div>
+ <div class="row" style="margin-top:12px">
+  <button id="run">Run backtest</button>
+  <button id="share" class="ghost" disabled>Copy share link</button>
+  <span id="shareSt" class="muted note"></span>
+ </div>
+ <div id="st" class="muted" role="status" aria-live="polite"></div>
+</div>
+
+<div id="out" hidden>
+ <div class="cmp">
+  <div class="side dca">
+   <h3><span class="dot" style="background:#5dffb0"></span>DCA <span class="muted note" id="dcaSub"></span></h3>
+   <div class="roi num" id="dcaRoi">–</div>
+   <div class="kv"><span>Total invested</span><span class="num" id="dcaInv"></span></div>
+   <div class="kv"><span>Coins accumulated</span><span class="num" id="dcaCoins"></span></div>
+   <div class="kv"><span>Average cost</span><span class="num" id="dcaAvg"></span></div>
+   <div class="kv"><span>Current value</span><span class="num" id="dcaVal"></span></div>
+   <div class="kv"><span>Profit / loss</span><span class="num" id="dcaPnl"></span></div>
+  </div>
+  <div class="side lump">
+   <h3><span class="dot" style="background:#b18cff"></span>Lump-sum <span class="muted note" id="lumpSub"></span></h3>
+   <div class="roi num" id="lumpRoi">–</div>
+   <div class="kv"><span>Total invested</span><span class="num" id="lumpInv"></span></div>
+   <div class="kv"><span>Coins accumulated</span><span class="num" id="lumpCoins"></span></div>
+   <div class="kv"><span>Average cost</span><span class="num" id="lumpAvg"></span></div>
+   <div class="kv"><span>Current value</span><span class="num" id="lumpVal"></span></div>
+   <div class="kv"><span>Profit / loss</span><span class="num" id="lumpPnl"></span></div>
+  </div>
+ </div>
+ <p class="verdict" id="verdict"></p>
+
+ <div class="card">
+  <h2>Equity curves</h2>
+  <div id="chartWrap"><canvas id="cv" aria-label="Equity curve chart comparing DCA and lump-sum portfolio value"></canvas><div id="tip" class="mono"></div></div>
+  <div class="legend"><span><i style="background:#5dffb0"></i>DCA value</span><span><i style="background:#b18cff"></i>Lump-sum value</span><span><i style="background:repeating-linear-gradient(90deg,#7a8a80 0 4px,transparent 4px 7px)"></i>DCA cash invested</span></div>
+ </div>
+</div>
+
+<div class="card note muted">
+ <b style="color:#cfe">Data source:</b> daily USD closes from the <a href="https://www.coingecko.com/" target="_blank" rel="noopener">CoinGecko</a> public API (<span class="mono">/api/v3/coins/{id}/market_chart</span>), fetched directly by your browser. The last point is the latest live price. Buys are simulated at the daily price with no fees, spread or slippage, so real results will differ.
+ <br><b style="color:#ff5d7a">Not financial advice.</b> Past performance says nothing about future returns. This is an educational toy.
+</div>
+
+<div class="card capture">
+ <h2>Get new free tools + alpha drops</h2>
+ <p class="muted note" style="margin:0 0 10px">One email when a new free tool ships. No spam, unsubscribe anytime.</p>
+ <form id="capture" action="https://formspree.io/f/YOUR_FORMSPREE_ID" method="POST" class="row">
+  <input type="email" name="email" required placeholder="you@example.com" autocomplete="email" aria-label="Email address">
+  <input type="hidden" name="tool" value="dca-backtester">
+  <button type="submit" class="btn-grad">Subscribe</button>
+ </form>
+ <div id="capSt" class="muted note" role="status" aria-live="polite" style="margin-top:8px"></div>
+</div>
+</main>
+
+<footer>
+ <div><a href="./">← all free tools</a> · made by <a href="https://anonymusk7.github.io/anonymusk/">anonymusk</a> · want studio-grade launch videos? <a href="https://anonymusk.gumroad.com/l/sztuha">Motion pack $29</a> / <a href="https://anonymusk.gumroad.com/l/ksgvlu">Launch kit $79</a></div>
+ <div style="margin-top:8px">anonymusk tools</div>
+</footer>
+
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const C={dca:'#5dffb0',lump:'#b18cff',inv:'#7a8a80'};
+const cache=new Map();let R=null;
+
+/* ---------- formatting ---------- */
+const usd=v=>{if(!isFinite(v))return'–';const a=Math.abs(v);const d=a>=1000?0:a>=1?2:a>=0.01?4:8;return(v<0?'-$':'$')+a.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})};
+const usdShort=v=>{const a=Math.abs(v);if(a>=1e9)return'$'+(v/1e9).toFixed(2)+'B';if(a>=1e6)return'$'+(v/1e6).toFixed(2)+'M';if(a>=1e4)return'$'+(v/1e3).toFixed(1)+'k';return usd(v)};
+const qty=v=>{const a=Math.abs(v);const d=a>=1e6?0:a>=1000?2:a>=1?4:8;return v.toLocaleString('en-US',{maximumFractionDigits:d})};
+const pct=v=>(v>=0?'+':'')+v.toFixed(2)+'%';
+const day=ts=>new Date(ts).toISOString().slice(0,10);
+const cls=(el,v)=>{el.classList.toggle('pos',v>=0);el.classList.toggle('neg',v<0)};
+
+/* ---------- inputs + url hash ---------- */
+function readInputs(){
+ const coin=$('coin').value.trim().toLowerCase();
+ const amt=+$('amt').value;const freq=$('freq').value;
+ let days=Math.round(+$('days').value);
+ if(!/^[a-z0-9][a-z0-9-]{0,99}$/.test(coin))throw Error('Enter a valid CoinGecko id (lowercase letters, digits, dashes), e.g. "bitcoin".');
+ if(!(amt>0))throw Error('Amount per buy must be greater than 0.');
+ if(!(days>=7))days=7;if(days>365)days=365;$('days').value=days;
+ return{coin,amt,freq,days};
+}
+function writeHash(p){const h='coin='+encodeURIComponent(p.coin)+'&amt='+p.amt+'&freq='+p.freq+'&days='+p.days;if(location.hash.slice(1)!==h)history.replaceState(null,'','#'+h)}
+function readHash(){
+ const q=new URLSearchParams(location.hash.slice(1));let any=false;
+ if(q.get('coin')){$('coin').value=q.get('coin').slice(0,100);any=true}
+ if(+q.get('amt')>0){$('amt').value=+q.get('amt');any=true}
+ if(['daily','weekly','monthly'].includes(q.get('freq'))){$('freq').value=q.get('freq');any=true}
+ if(+q.get('days')>0){$('days').value=Math.min(365,Math.max(7,Math.round(+q.get('days'))));any=true}
+ syncChips();return any;
+}
+function syncChips(){const c=$('coin').value.trim().toLowerCase();document.querySelectorAll('.chip').forEach(b=>b.classList.toggle('on',b.dataset.id===c))}
+
+/* ---------- data ---------- */
+async function getPrices(coin){
+ const hit=cache.get(coin);if(hit&&Date.now()-hit.t<5*60e3)return hit.d;
+ const url='https://api.coingecko.com/api/v3/coins/'+encodeURIComponent(coin)+'/market_chart?vs_currency=usd&days=365&interval=daily';
+ let r;
+ try{r=await fetch(url,{headers:{Accept:'application/json'}})}
+ catch(e){throw Error('Network error reaching CoinGecko (offline, blocked, or rate-limited). Wait a minute and retry.')}
+ if(r.status===404)throw Error('CoinGecko has no coin with id "'+coin+'". Use the id from the coin\'s CoinGecko URL, e.g. "shiba-inu".');
+ if(r.status===429)throw Error('CoinGecko rate limit hit (free public API). Wait about a minute and try again.');
+ if(!r.ok)throw Error('CoinGecko returned HTTP '+r.status+'. Try again shortly.');
+ const j=await r.json();
+ const raw=(j&&Array.isArray(j.prices))?j.prices.filter(p=>Array.isArray(p)&&isFinite(p[0])&&p[1]>0):[];
+ if(raw.length<2)throw Error('Not enough price history for "'+coin+'".');
+ // one point per UTC day (the final point is the live price and replaces nothing but the newest day)
+ const byDay=new Map();for(const[t,p]of raw)byDay.set(day(t),[t,p]);
+ const d=[...byDay.values()].sort((a,b)=>a[0]-b[0]);
+ cache.set(coin,{t:Date.now(),d});return d;
+}
+
+/* ---------- simulation ---------- */
+function simulate(prices,p){
+ const s=prices.slice(-(p.days+1));
+ const nowPx=s[s.length-1][1];
+ // buy schedule: index 0, then every 1 / 7 days, or same calendar day each month (clamped to month end)
+ const buys=new Set([0]);
+ if(p.freq==='daily')for(let i=1;i<s.length-1;i++)buys.add(i);
+ else if(p.freq==='weekly')for(let i=7;i<s.length-1;i+=7)buys.add(i);
+ else{
+  const d0=new Date(s[0][0]),dom=d0.getUTCDate();let m=1;
+  for(;;){
+   const y=d0.getUTCFullYear(),mo=d0.getUTCMonth()+m;
+   const last=new Date(Date.UTC(y,mo+1,0)).getUTCDate();
+   const target=Date.UTC(y,mo,Math.min(dom,last));
+   const i=s.findIndex(x=>x[0]>=target);
+   if(i<0||i>=s.length-1)break;buys.add(i);m++;
+  }
+ }
+ const total=buys.size*p.amt;
+ const lumpCoins=total/s[0][1];
+ let coins=0,inv=0;const curve=[];
+ s.forEach(([t,px],i)=>{if(buys.has(i)){coins+=p.amt/px;inv+=p.amt}curve.push({t,px,dca:coins*px,lump:lumpCoins*px,inv})});
+ const dcaVal=coins*nowPx,lumpVal=lumpCoins*nowPx;
+ return{s,curve,nBuys:buys.size,
+  dca:{inv:total,coins,avg:total/coins,val:dcaVal,pnl:dcaVal-total,roi:(dcaVal/total-1)*100},
+  lump:{inv:total,coins:lumpCoins,avg:s[0][1],val:lumpVal,pnl:lumpVal-total,roi:(lumpVal/total-1)*100}};
+}
+
+/* ---------- render ---------- */
+function render(res,p){
+ const set=(k,o)=>{
+  $(k+'Inv').textContent=usd(o.inv);$(k+'Coins').textContent=qty(o.coins);$(k+'Avg').textContent=usd(o.avg);
+  $(k+'Val').textContent=usd(o.val);$(k+'Pnl').textContent=(o.pnl>=0?'+':'')+usd(o.pnl);cls($(k+'Pnl'),o.pnl);
+  $(k+'Roi').textContent=pct(o.roi);cls($(k+'Roi'),o.roi);
+ };
+ set('dca',res.dca);set('lump',res.lump);
+ $('dcaSub').textContent='· '+res.nBuys+' × '+usd(p.amt)+' '+p.freq;
+ $('lumpSub').textContent='· all in on '+day(res.s[0][0]);
+ const diff=res.dca.val-res.lump.val,win=diff>=0?'DCA':'Lump-sum';
+ $('verdict').innerHTML='';
+ const v=$('verdict');v.append(win+' came out ahead by ');
+ const b=document.createElement('span');b.className='num '+(diff>=0?'pos':'')+'';b.style.color=diff>=0?C.dca:C.lump;b.textContent=usd(Math.abs(diff));v.append(b);
+ v.append(' ('+Math.abs(res.dca.roi-res.lump.roi).toFixed(2)+' pts of ROI) over '+(res.s.length-1)+' days, '+day(res.s[0][0])+' → '+day(res.s[res.s.length-1][0])+'.');
+ $('out').hidden=false;R=res;draw();
+}
+
+const cv=$('cv'),tip=$('tip');let geo=null,hover=-1;
+function draw(){
+ if(!R)return;
+ const dpr=Math.max(1,window.devicePixelRatio||1),W=cv.clientWidth,H=cv.clientHeight;
+ cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);
+ const c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,W,H);
+ const d=R.curve,n=d.length;
+ const pad={l:W<500?52:66,r:14,t:16,b:30};
+ let mx=0;for(const x of d)mx=Math.max(mx,x.dca,x.lump,x.inv);mx*=1.06;const mn=0;
+ const X=i=>pad.l+i/(n-1)*(W-pad.l-pad.r),Y=v=>pad.t+(1-(v-mn)/(mx-mn||1))*(H-pad.t-pad.b);
+ geo={X,Y,pad,W,H,n};
+ // grid + y labels
+ c.font='11px ui-monospace,Menlo,Consolas,monospace';c.textBaseline='middle';
+ const step=niceStep(mx/5);
+ for(let v=0;v<=mx;v+=step){const y=Y(v);c.strokeStyle='#141c17';c.lineWidth=1;c.beginPath();c.moveTo(pad.l,y);c.lineTo(W-pad.r,y);c.stroke();c.fillStyle='#6a7a70';c.textAlign='right';c.fillText(usdShort(v),pad.l-6,y)}
+ // x labels
+ c.textAlign='center';c.textBaseline='top';const ticks=W<500?3:6;
+ for(let k=0;k<=ticks;k++){const i=Math.round(k/ticks*(n-1));c.fillStyle='#6a7a70';c.fillText(day(d[i].t).slice(5),Math.min(Math.max(X(i),pad.l+18),W-pad.r-18),H-pad.b+8)}
+ // invested step line
+ c.setLineDash([4,3]);line(c,d,'inv',C.inv,1.5,X,Y,true);c.setLineDash([]);
+ // fills + curves
+ area(c,d,'lump',C.lump,X,Y,H-pad.b);area(c,d,'dca',C.dca,X,Y,H-pad.b);
+ line(c,d,'lump',C.lump,2,X,Y);line(c,d,'dca',C.dca,2.4,X,Y);
+ if(hover>=0&&hover<n){
+  const x=X(hover);c.strokeStyle='#2a3a30';c.lineWidth=1;c.beginPath();c.moveTo(x,pad.t);c.lineTo(x,H-pad.b);c.stroke();
+  for(const[k,col]of[['dca',C.dca],['lump',C.lump]]){c.fillStyle=col;c.beginPath();c.arc(x,Y(d[hover][k]),4,0,7);c.fill()}
+ }
+}
+function niceStep(r){const p=Math.pow(10,Math.floor(Math.log10(r||1))),f=r/p;return(f<1.5?1:f<3?2:f<7?5:10)*p}
+function line(c,d,k,col,w,X,Y,stepped){c.strokeStyle=col;c.lineWidth=w;c.lineJoin='round';c.beginPath();d.forEach((p,i)=>{const x=X(i),y=Y(p[k]);if(!i)c.moveTo(x,y);else{if(stepped)c.lineTo(x,Y(d[i-1][k]));c.lineTo(x,y)}});c.stroke()}
+function area(c,d,k,col,X,Y,base){const g=c.createLinearGradient(0,0,0,base);g.addColorStop(0,col+'33');g.addColorStop(1,col+'00');c.fillStyle=g;c.beginPath();c.moveTo(X(0),base);d.forEach((p,i)=>c.lineTo(X(i),Y(p[k])));c.lineTo(X(d.length-1),base);c.closePath();c.fill()}
+
+function onMove(e){
+ if(!R||!geo)return;const r=cv.getBoundingClientRect(),x=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
+ const i=Math.round((x-geo.pad.l)/(geo.W-geo.pad.l-geo.pad.r)*(geo.n-1));
+ if(i<0||i>=geo.n){onLeave();return}
+ hover=i;draw();const p=R.curve[i];
+ tip.innerHTML='';const add=(t,col)=>{const dv=document.createElement('div');dv.textContent=t;if(col)dv.style.color=col;tip.append(dv)};
+ add(day(p.t)+' · px '+usd(p.px),'#cfe');add('DCA   '+usd(p.dca),C.dca);add('Lump  '+usd(p.lump),C.lump);add('In    '+usd(p.inv),'#9ab');
+ tip.style.display='block';const tw=tip.offsetWidth,gx=geo.X(i);
+ tip.style.left=(gx+12+tw>r.width?gx-tw-12:gx+12)+'px';tip.style.top='12px';
+}
+function onLeave(){hover=-1;tip.style.display='none';draw()}
+cv.addEventListener('mousemove',onMove);cv.addEventListener('touchmove',onMove,{passive:true});
+cv.addEventListener('mouseleave',onLeave);cv.addEventListener('touchend',onLeave);
+let rz;window.addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(draw,80)});
+
+/* ---------- run ---------- */
+let busy=false,seq=0;
+async function run(){
+ const st=$('st');let p;
+ try{p=readInputs()}catch(e){st.className='err';st.textContent=e.message;return}
+ writeHash(p);syncChips();
+ const my=++seq;busy=true;$('run').disabled=true;
+ st.className='muted';st.innerHTML='<span class="spin"></span>Loading '+(p.coin.length>40?'':'')+'prices from CoinGecko…';
+ try{
+  const prices=await getPrices(p.coin);if(my!==seq)return;
+  if(prices.length<p.days+1&&prices.length<8)throw Error('Only '+prices.length+' days of history for "'+p.coin+'".');
+  const res=simulate(prices,p);render(res,p);
+  const span=res.s.length-1;
+  st.textContent='Simulated '+span+' days of '+p.coin+(span<p.days?' (coin has only '+span+' days of history)':'')+'. Last price '+usd(res.s[res.s.length-1][1])+'.';
+  $('share').disabled=false;
+ }catch(e){if(my!==seq)return;st.className='err';st.textContent=e.message}
+ finally{if(my===seq){busy=false;$('run').disabled=false}}
+}
+$('run').onclick=run;
+['amt','days','coin'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')run()}));
+$('coin').addEventListener('input',syncChips);
+$('freq').addEventListener('change',()=>{if(R)run()});
+$('presets').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;$('coin').value=b.dataset.id;run()});
+$('share').onclick=async()=>{
+ let p;try{p=readInputs()}catch(e){return}writeHash(p);const u=location.href,s=$('shareSt');
+ try{await navigator.clipboard.writeText(u);s.textContent='Link copied ✓'}catch(e){s.textContent=u}
+ setTimeout(()=>{if(s.textContent==='Link copied ✓')s.textContent=''},2500);
+};
+window.addEventListener('hashchange',()=>{if(readHash())run()});
+readHash();run();
+
+/* ---------- email capture ---------- */
+const f=$('capture'),cs=$('capSt'),SLUG='dca-backtester';
+f.addEventListener('submit',async e=>{
+ const email=f.email.value.trim();
+ if(f.action.includes('YOUR_FORMSPREE_ID')){
+  e.preventDefault();
+  location.href='mailto:anonymusk@mail.grokbot.com?subject='+encodeURIComponent('Subscribe: '+SLUG)+'&body='+encodeURIComponent('Please add '+email+' to the anonymusk free-tools list.');
+  cs.className='muted note';cs.textContent='Opening your email app. Hit send to finish subscribing.';
+  return;
+ }
+ e.preventDefault();
+ const btn=f.querySelector('button');btn.disabled=true;cs.className='muted note';cs.textContent='Sending…';
+ try{
+  const r=await fetch(f.action,{method:'POST',body:new FormData(f),headers:{Accept:'application/json'}});
+  if(!r.ok){let m='HTTP '+r.status;try{const j=await r.json();if(j&&j.errors)m=j.errors.map(x=>x.message).join(', ')}catch(_){}throw Error(m)}
+  f.reset();cs.className='pos note';cs.textContent='Thanks! You\'re on the list. Watch your inbox for the next drop.';
+ }catch(err){cs.className='err note';cs.textContent='Could not subscribe ('+err.message+'). Please try again.'}
+ finally{btn.disabled=false}
+});
+})();
+</script>
+</body>
+</html>

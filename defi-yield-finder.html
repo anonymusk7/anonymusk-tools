@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DeFi Yield Finder: top APY pools by chain, TVL &amp; risk | anonymusk</title>
+<meta name="description" content="Free DeFi yield finder. Filter thousands of DefiLlama pools by chain, TVL, stablecoins and impermanent-loss risk, then sort by APY or TVL. Runs entirely in your browser.">
+<meta property="og:title" content="DeFi Yield Finder | anonymusk">
+<meta property="og:description" content="Filter DefiLlama yield pools by chain, TVL, stablecoin and IL risk. Free, client-side.">
+<style>
+body{margin:0;background:#07090c;color:#e8f0ea;font:16px/1.5 Inter,system-ui,sans-serif}
+main{max-width:1100px;margin:auto;padding:24px}
+h1{font-size:2rem;margin:.2em 0}
+h2{font-size:1.25rem;margin:.1em 0 .4em}
+a{color:#5dffb0}
+input,select,button{font:inherit;padding:10px 14px;border-radius:10px;border:1px solid #2a3a30;background:#101612;color:#e8f0ea}
+button{background:#5dffb0;color:#04130b;font-weight:800;cursor:pointer;border:0}
+button:disabled{opacity:.5;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.card{background:#0e1411;border:1px solid #1d2a22;border-radius:14px;padding:16px;margin:10px 0}
+.muted{color:#7a8a80}
+.acc{color:#5dffb0}.pur{color:#a98bff}
+.num,code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.filters{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;align-items:end}
+.filters label{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:#9fb}
+.filters label.chk{flex-direction:row;align-items:center;gap:8px;font-size:.95rem;color:#e8f0ea;padding:10px 0}
+.filters input[type=checkbox]{width:18px;height:18px;accent-color:#5dffb0;padding:0}
+.warn{border-color:#5a3a2b;background:linear-gradient(135deg,#1a110c,#120e1c)}
+.warn b{color:#ffb35d}
+.tw{overflow-x:auto;border:1px solid #1d2a22;border-radius:14px;margin-top:10px}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{padding:9px 12px;text-align:left;white-space:nowrap;border-bottom:1px solid #16201b}
+th{background:#0b100d;color:#9fb;font-weight:600;position:sticky;top:0}
+td.num,th.num{text-align:right}
+tbody tr:hover{background:#0f1813}
+.hi{color:#ffb35d}.xhi{color:#ff5d7a;font-weight:700}
+.pill{font-size:.75rem;padding:2px 8px;border-radius:99px;border:1px solid #2a3a30;color:#9fb;margin-left:6px}
+.pill.st{border-color:#7a8cff;color:#a9b4ff}
+.pill.il{border-color:#5dffb0;color:#5dffb0}
+.bar{height:4px;background:#101612;border-radius:4px;overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#5dffb0,#7a8cff);transition:width .2s}
+.cap{border-color:#2b5a40;background:linear-gradient(135deg,#0c1712,#0e1020)}
+.cap input[type=email]{flex:1;min-width:220px}
+.btn{display:inline-block;background:linear-gradient(90deg,#5dffb0,#7a8cff);color:#04130b;font-weight:800;padding:10px 18px;border-radius:10px;text-decoration:none}
+footer{text-align:center;padding:30px;color:#7a8a80;font-size:.9rem}
+@media(max-width:600px){main{padding:14px}h1{font-size:1.5rem}th,td{padding:7px 8px}}
+</style>
+</head>
+<body>
+<main>
+<h1>🌾 DeFi Yield Finder</h1>
+<p class="muted">Search thousands of yield pools across every chain DefiLlama tracks. Filter by chain, TVL, stablecoins and impermanent-loss risk, then sort by APY or TVL. Everything runs in your browser.</p>
+
+<div class="card">
+ <div class="row"><button id="reload">Reload data</button><span id="st" class="muted">Starting…</span></div>
+ <div class="bar"><i id="pb"></i></div>
+</div>
+
+<div class="card">
+ <div class="filters">
+  <label>Chain<select id="chain" disabled><option value="">All chains</option></select></label>
+  <label>Min TVL (USD)<input id="minTvl" type="number" min="0" step="100000" value="1000000" inputmode="numeric"></label>
+  <label>Search symbol / project<input id="q" type="search" placeholder="e.g. USDC, aave, curve"></label>
+  <label>Sort by<select id="sort"><option value="apy">APY (total) ↓</option><option value="tvl">TVL ↓</option><option value="mean">30d mean APY ↓</option></select></label>
+  <label class="chk"><input id="stable" type="checkbox"> Stablecoins only</label>
+  <label class="chk"><input id="noil" type="checkbox"> No IL risk only</label>
+ </div>
+ <div id="count" class="muted" style="margin-top:10px"></div>
+</div>
+
+<div class="card warn"><b>⚠ High APY = high risk.</b> Triple-digit yields usually come from inflationary reward tokens, tiny or new pools, leverage, or bugs in the data. They can fall to near zero overnight, and the underlying contracts can be exploited. Compare the current APY with the <b>30d mean</b>, check TVL, and do your own research before depositing anything. APYs above 100% are shown in <span class="hi">orange</span>, above 1,000% in <span class="xhi">red</span>.</div>
+
+<div class="tw">
+<table>
+ <thead><tr><th>#</th><th>Project</th><th>Chain</th><th>Symbol</th><th class="num">TVL</th><th class="num">APY base</th><th class="num">APY reward</th><th class="num">APY total</th><th class="num">30d mean</th><th>Pool</th></tr></thead>
+ <tbody id="tb"><tr><td colspan="10" class="muted">Loading pools…</td></tr></tbody>
+</table>
+</div>
+
+<p class="muted" style="font-size:.85rem">Data source: <a href="https://defillama.com/yields" target="_blank" rel="noopener">DefiLlama Yields</a> public API (<code>yields.llama.fi/pools</code>), fetched straight from your browser. Data is held in memory only and cleared when you close or refresh the tab. Showing the top 100 matches. <b>Not financial advice.</b> Figures can be stale or wrong, so check the protocol yourself.</p>
+
+<div class="card cap">
+ <h2>📬 Get new free tools + alpha drops</h2>
+ <p class="muted" style="margin:.2em 0 .8em">One short email when a new free tool ships. No spam, unsubscribe anytime.</p>
+ <form id="capture" action="https://formspree.io/f/YOUR_FORMSPREE_ID" method="POST">
+  <div class="row">
+   <input type="email" name="email" required placeholder="you@example.com" aria-label="Email address">
+   <input type="hidden" name="tool" value="defi-yield-finder">
+   <button type="submit">Subscribe</button>
+  </div>
+  <div id="capMsg" class="muted" style="margin-top:8px"></div>
+ </form>
+</div>
+</main>
+
+<footer>
+ <div style="margin-bottom:6px"><b class="acc">anonymusk tools</b></div>
+ <a href="./">← all free tools</a> · made by <a href="https://anonymusk7.github.io/anonymusk/">anonymusk</a> · want studio-grade launch videos? <a href="https://anonymusk.gumroad.com/l/sztuha">Motion pack $29</a> / <a href="https://anonymusk.gumroad.com/l/ksgvlu">Launch kit $79</a>
+</footer>
+
+<script>
+(function(){
+'use strict';
+var API='https://yields.llama.fi/pools';
+var $=function(id){return document.getElementById(id)};
+var st=$('st'),pb=$('pb'),tb=$('tb'),chainSel=$('chain'),count=$('count'),reloadBtn=$('reload');
+var POOLS=null; // in-memory cache only (no storage APIs)
+var loading=false;
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function money(n){if(n==null||!isFinite(n))return'—';var a=Math.abs(n);return '$'+(a>=1e9?(n/1e9).toFixed(2)+'B':a>=1e6?(n/1e6).toFixed(2)+'M':a>=1e3?(n/1e3).toFixed(1)+'K':n.toFixed(0))}
+function pct(n){if(n==null||!isFinite(n))return'—';var a=Math.abs(n);return (a>=1000?n.toLocaleString('en-US',{maximumFractionDigits:0}):a>=100?n.toFixed(1):n.toFixed(2))+'%'}
+function apyCls(n){return n>1000?'xhi':n>100?'hi':''}
+function mb(b){return (b/1048576).toFixed(1)+' MB'}
+function num(v){return typeof v==='number'&&isFinite(v)?v:null}
+
+async function fetchPools(){
+ var r=await fetch(API,{cache:'no-store'});
+ if(!r.ok)throw new Error('HTTP '+r.status);
+ var total=+r.headers.get('content-length')||0;
+ var text;
+ if(r.body&&r.body.getReader){
+  var reader=r.body.getReader(),chunks=[],got=0;
+  for(;;){
+   var x=await reader.read();if(x.done)break;
+   chunks.push(x.value);got+=x.value.length;
+   // content-length may be the compressed size, so cap the bar and show raw bytes
+   st.textContent='Downloading pools… '+mb(got)+(total&&got<=total?' / '+mb(total):'');
+   pb.style.width=(total&&got<=total?Math.round(got/total*100):Math.min(95,Math.round(got/(11*1048576)*100)))+'%';
+  }
+  st.textContent='Parsing '+mb(got)+'…';
+  var buf=new Uint8Array(got),o=0;chunks.forEach(function(c){buf.set(c,o);o+=c.length});
+  text=new TextDecoder().decode(buf);
+ }else{
+  st.textContent='Downloading pools (~11 MB)…';
+  text=await r.text();
+ }
+ await new Promise(function(res){setTimeout(res,0)}); // let "Parsing" paint
+ var j=JSON.parse(text);
+ var arr=Array.isArray(j)?j:j&&Array.isArray(j.data)?j.data:null;
+ if(!arr)throw new Error('unexpected response format');
+ return arr.map(function(p){
+  var base=num(p.apyBase),rew=num(p.apyReward),tot=num(p.apy);
+  if(tot==null&&(base!=null||rew!=null))tot=(base||0)+(rew||0);
+  return{pool:String(p.pool||''),project:String(p.project||''),chain:String(p.chain||''),symbol:String(p.symbol||''),
+   tvl:num(p.tvlUsd)||0,base:base,rew:rew,apy:tot,mean:num(p.apyMean30d),stable:p.stablecoin===true,noIl:p.ilRisk==='no',
+   hay:(String(p.symbol||'')+' '+String(p.project||'')+' '+String(p.poolMeta||'')).toLowerCase()};
+ });
+}
+
+function buildChains(){
+ var tvlBy={};POOLS.forEach(function(p){if(p.chain)tvlBy[p.chain]=(tvlBy[p.chain]||0)+p.tvl});
+ var prev=chainSel.value;
+ var names=Object.keys(tvlBy).sort(function(a,b){return tvlBy[b]-tvlBy[a]});
+ chainSel.innerHTML='<option value="">All chains ('+names.length+')</option>'+names.map(function(n){return'<option value="'+esc(n)+'">'+esc(n)+' · '+money(tvlBy[n])+'</option>'}).join('');
+ if(prev&&tvlBy[prev])chainSel.value=prev;
+ chainSel.disabled=false;
+}
+
+function render(){
+ if(!POOLS)return;
+ var chain=chainSel.value,minTvl=Math.max(0,+$('minTvl').value||0),q=$('q').value.trim().toLowerCase(),
+  stable=$('stable').checked,noil=$('noil').checked,sort=$('sort').value;
+ var terms=q?q.split(/\s+/):[];
+ var rows=POOLS.filter(function(p){
+  if(chain&&p.chain!==chain)return false;
+  if(p.tvl<minTvl)return false;
+  if(stable&&!p.stable)return false;
+  if(noil&&!p.noIl)return false;
+  for(var i=0;i<terms.length;i++)if(p.hay.indexOf(terms[i])<0)return false;
+  return true;
+ });
+ var key=sort==='tvl'?'tvl':sort==='mean'?'mean':'apy';
+ rows.sort(function(a,b){var x=a[key],y=b[key];if(x==null)x=-Infinity;if(y==null)y=-Infinity;return y-x});
+ var top=rows.slice(0,100);
+ count.innerHTML='<span class="num acc">'+rows.length.toLocaleString()+'</span> pools match · showing top <span class="num">'+top.length+'</span> of <span class="num">'+POOLS.length.toLocaleString()+'</span> total';
+ if(!top.length){tb.innerHTML='<tr><td colspan="10" class="muted">No pools match these filters. Try lowering min TVL or clearing the search.</td></tr>';return}
+ tb.innerHTML=top.map(function(p,i){
+  var tags=(p.stable?'<span class="pill st">stable</span>':'')+(p.noIl?'<span class="pill il">no IL</span>':'');
+  var link=p.pool?'<a href="https://defillama.com/yields/pool/'+encodeURIComponent(p.pool)+'" target="_blank" rel="noopener">view ↗</a>':'—';
+  return'<tr><td class="num muted">'+(i+1)+'</td><td>'+esc(p.project)+'</td><td>'+esc(p.chain)+'</td><td>'+esc(p.symbol)+tags+'</td>'+
+   '<td class="num">'+money(p.tvl)+'</td><td class="num">'+pct(p.base)+'</td><td class="num pur">'+pct(p.rew)+'</td>'+
+   '<td class="num '+apyCls(p.apy)+'"><b>'+pct(p.apy)+'</b></td><td class="num '+apyCls(p.mean)+'">'+pct(p.mean)+'</td><td>'+link+'</td></tr>';
+ }).join('');
+}
+
+async function load(){
+ if(loading)return;loading=true;reloadBtn.disabled=true;pb.style.width='2%';
+ st.textContent='Connecting to DefiLlama…';
+ try{
+  var data=await fetchPools();
+  POOLS=data;pb.style.width='100%';
+  st.innerHTML='Loaded <span class="num acc">'+POOLS.length.toLocaleString()+'</span> pools · '+new Date().toLocaleTimeString()+' · cached in memory for this tab';
+  buildChains();render();
+ }catch(e){
+  pb.style.width='0';
+  st.innerHTML='<span class="xhi">Could not load pools ('+esc(e&&e.message||e)+').</span> The API may be busy or blocked by your network. Hit “Reload data” to try again.';
+  if(!POOLS)tb.innerHTML='<tr><td colspan="10" class="muted">No data loaded.</td></tr>';
+ }finally{loading=false;reloadBtn.disabled=false}
+}
+
+var t;function deb(){clearTimeout(t);t=setTimeout(render,150)}
+['chain','sort','stable','noil'].forEach(function(id){$(id).addEventListener('change',render)});
+$('minTvl').addEventListener('input',deb);$('q').addEventListener('input',deb);
+reloadBtn.addEventListener('click',load);
+load();
+
+// email capture
+var form=$('capture'),capMsg=$('capMsg');
+form.addEventListener('submit',async function(ev){
+ var email=form.email.value.trim(),slug=form.tool.value;
+ if(form.action.indexOf('YOUR_FORMSPREE_ID')>=0){
+  ev.preventDefault();
+  location.href='mailto:anonymusk@mail.grokbot.com?subject='+encodeURIComponent('Subscribe: '+slug)+'&body='+encodeURIComponent('Please add '+email+' to the anonymusk free-tools list.');
+  capMsg.textContent='Opening your email app. Hit send there to finish subscribing.';
+  return;
+ }
+ ev.preventDefault();
+ var btn=form.querySelector('button');btn.disabled=true;capMsg.textContent='Sending…';
+ try{
+  var r=await fetch(form.action,{method:'POST',body:new FormData(form),headers:{Accept:'application/json'}});
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  form.reset();capMsg.innerHTML='<span class="acc">✓ Thanks! You’re on the list.</span>';
+ }catch(e){
+  capMsg.innerHTML='<span class="xhi">Couldn’t subscribe right now ('+esc(e.message)+'). Please try again later.</span>';
+ }finally{btn.disabled=false}
+});
+})();
+</script>
+</body>
+</html>

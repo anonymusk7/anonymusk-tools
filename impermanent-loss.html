@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🌊 Impermanent loss calculator (50/50 AMM) | anonymusk</title>
+<meta name="description" content="Free impermanent loss calculator for 50/50 AMM liquidity positions. Live CoinGecko prices, HODL vs LP value, fee income, net result, break-even APR and an IL curve chart. Runs in your browser.">
+<meta property="og:title" content="Impermanent loss calculator (50/50 AMM) | anonymusk">
+<meta property="og:description" content="HODL vs LP, IL % and USD, fees, break-even APR. Live prices, client-side only.">
+<style>
+body{margin:0;background:#07090c;color:#e8f0ea;font:16px/1.5 Inter,system-ui,sans-serif}
+main{max-width:1000px;margin:auto;padding:24px}
+h1{font-size:2rem;margin:.2em 0}
+h2{font-size:1.05rem;margin:0 0 10px;color:#cfe}
+a{color:#5dffb0}
+input,select,button{font:inherit;padding:10px 14px;border-radius:10px;border:1px solid #2a3a30;background:#101612;color:#e8f0ea}
+input{min-width:0;box-sizing:border-box}
+button{background:#5dffb0;color:#04130b;font-weight:800;cursor:pointer;border:0}
+button:disabled{opacity:.5;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.card{background:#0e1411;border:1px solid #1d2a22;border-radius:14px;padding:16px;margin:10px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.muted{color:#7a8a80}
+.mono,.num,input[type=number]{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums}
+label{display:block;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:#8a9;margin-bottom:4px}
+.fld input{width:100%}
+.tok{border-left:3px solid #5dffb0}
+.tok.b{border-left-color:#a78bfa}
+.tok h2 .sym{color:#5dffb0}.tok.b h2 .sym{color:#a78bfa}
+input[type=range]{width:100%;padding:0;accent-color:#5dffb0;background:transparent;border:0}
+.tok.b input[type=range]{accent-color:#a78bfa}
+.pct{font-weight:700}
+.stat .lbl{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:#8a9}
+.stat .big{font-size:1.7rem;font-weight:800;line-height:1.15;margin:4px 0 2px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums;word-break:break-all}
+.stat .sub{font-size:.85rem;color:#7a8a80}
+.pos{color:#5dffb0}.neg{color:#ff5d7a}
+.stat.hl{border-color:#2b5a40;background:linear-gradient(135deg,#0c1712,#0e1020)}
+canvas{width:100%;height:auto;max-width:100%;border-radius:14px;display:block;margin:6px 0;background:#000}
+#st{min-height:1.5em}
+#st.err{color:#ff5d7a}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid #5dffb0;border-right-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-1px;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.cap{border-color:#2b5a40;background:linear-gradient(135deg,#0c1712,#0e1020)}
+.cap input[type=email]{flex:1;min-width:200px}
+.note{font-size:.85rem;color:#7a8a80;border-left:3px solid #a78bfa;padding-left:10px}
+footer{text-align:center;padding:30px;color:#7a8a80;font-size:.9rem}
+@media(max-width:640px){.two{grid-template-columns:1fr}h1{font-size:1.6rem}main{padding:16px}}
+</style>
+</head>
+<body>
+<main>
+<h1>🌊 Impermanent loss calculator</h1>
+<p class="muted">50/50 constant-product AMM position (Uniswap v2 style). Compare holding vs providing liquidity, add fee income, and see where you break even. Everything runs in your browser.</p>
+
+<div class="card">
+ <h2>Pair &amp; deposit</h2>
+ <div class="grid">
+  <div class="fld"><label for="idA">Token A (CoinGecko id)</label><input id="idA" value="ethereum" autocomplete="off" spellcheck="false"></div>
+  <div class="fld"><label for="idB">Token B (CoinGecko id)</label><input id="idB" value="usd-coin" autocomplete="off" spellcheck="false"></div>
+  <div class="fld"><label for="dep">Deposit (USD)</label><input id="dep" type="number" min="0" step="any" value="10000"></div>
+ </div>
+ <div class="row" style="margin-top:12px"><button id="fetch">Fetch current USD prices</button><span id="st" class="muted"></span></div>
+ <p class="muted" style="font-size:.85rem;margin:.6em 0 0">Fetching sets both entry and future prices to the live price; then move the sliders to model a scenario.</p>
+</div>
+
+<div class="two">
+ <div class="card tok">
+  <h2>Token A · <span class="sym" id="symA">ethereum</span></h2>
+  <div class="two">
+   <div class="fld"><label for="eA">Entry price $</label><input id="eA" type="number" min="0" step="any" value="3000"></div>
+   <div class="fld"><label for="fA">Future price $</label><input id="fA" type="number" min="0" step="any" value="3000"></div>
+  </div>
+  <label for="sA" style="margin-top:10px">Price change: <span class="pct mono" id="pA">0%</span></label>
+  <input id="sA" type="range" min="-90" max="500" step="1" value="0">
+ </div>
+ <div class="card tok b">
+  <h2>Token B · <span class="sym" id="symB">usd-coin</span></h2>
+  <div class="two">
+   <div class="fld"><label for="eB">Entry price $</label><input id="eB" type="number" min="0" step="any" value="1"></div>
+   <div class="fld"><label for="fB">Future price $</label><input id="fB" type="number" min="0" step="any" value="1"></div>
+  </div>
+  <label for="sB" style="margin-top:10px">Price change: <span class="pct mono" id="pB">0%</span></label>
+  <input id="sB" type="range" min="-90" max="500" step="1" value="0">
+ </div>
+</div>
+
+<div class="card">
+ <h2>Fee income (optional)</h2>
+ <div class="grid">
+  <div class="fld"><label for="apr">Pool fee APR %</label><input id="apr" type="number" min="0" step="any" value="12"></div>
+  <div class="fld"><label for="days">Days held</label><input id="days" type="number" min="0" step="1" value="90"></div>
+ </div>
+ <p class="muted" style="font-size:.85rem;margin:.6em 0 0">Fees = deposit × APR × days / 365 (simple, not compounded, on the initial deposit).</p>
+</div>
+
+<div class="grid" id="out">
+ <div class="card stat"><div class="lbl">HODL value</div><div class="big" id="oH">–</div><div class="sub" id="oH2"></div></div>
+ <div class="card stat"><div class="lbl">LP value (before fees)</div><div class="big" id="oL">–</div><div class="sub" id="oL2"></div></div>
+ <div class="card stat hl"><div class="lbl">Impermanent loss</div><div class="big" id="oI">–</div><div class="sub" id="oI2"></div></div>
+ <div class="card stat"><div class="lbl">Fee income</div><div class="big" id="oF">–</div><div class="sub" id="oF2"></div></div>
+ <div class="card stat hl"><div class="lbl">Net vs HODL (after fees)</div><div class="big" id="oN">–</div><div class="sub" id="oN2"></div></div>
+ <div class="card stat"><div class="lbl">Break-even APR</div><div class="big" id="oB">–</div><div class="sub" id="oB2"></div></div>
+</div>
+
+<div class="card">
+ <h2>IL % vs relative price change of A/B</h2>
+ <canvas id="cv" width="960" height="420" aria-label="Impermanent loss curve"></canvas>
+ <p class="muted" style="font-size:.85rem;margin:.4em 0 0">x = change in the A/B price ratio, r − 1. y = IL = 2·√r / (1 + r) − 1. The dot marks your current scenario<span id="clampNote"></span>.</p>
+</div>
+
+<div class="card">
+ <p class="note">Data source: live USD prices from the <a href="https://www.coingecko.com/" target="_blank" rel="noopener">CoinGecko</a> public API (<code>/api/v3/simple/price</code>), fetched directly from your browser. Model assumes a full-range 50/50 constant-product pool; concentrated-liquidity (v3) positions, weighted pools, gas, slippage and token rewards are not modeled. <b>Not financial advice.</b></p>
+</div>
+
+<div class="card cap">
+ <h2>Get new free tools + alpha drops</h2>
+ <form id="capture" action="https://formspree.io/f/YOUR_FORMSPREE_ID" method="POST" class="row">
+  <input type="email" name="email" placeholder="you@example.com" required aria-label="Email address">
+  <input type="hidden" name="tool" value="impermanent-loss">
+  <button type="submit" id="capBtn">Subscribe</button>
+ </form>
+ <div id="capMsg" class="muted" style="margin-top:8px"></div>
+</div>
+</main>
+
+<footer>
+ <div><a href="./">← all free tools</a> · made by <a href="https://anonymusk7.github.io/anonymusk/">anonymusk</a> · want studio-grade launch videos? <a href="https://anonymusk.gumroad.com/l/sztuha">Motion pack $29</a> / <a href="https://anonymusk.gumroad.com/l/ksgvlu">Launch kit $79</a></div>
+ <div style="margin-top:6px">anonymusk tools</div>
+</footer>
+
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const PMIN=-90,PMAX=500;
+const num=el=>{const v=parseFloat(el.value);return isFinite(v)?v:NaN};
+const usd=v=>{if(!isFinite(v))return'–';const a=Math.abs(v),d=a>=1000?0:a>=1?2:a>=0.01?4:6;return(v<0?'-$':'$')+a.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})};
+const sUsd=v=>(v>0?'+':'')+usd(v);
+const pct=(v,d=2)=>isFinite(v)?(v>0?'+':'')+v.toFixed(d)+'%':'–';
+const fmtP=v=>{if(!isFinite(v)||v<=0)return'';const a=Math.abs(v);return String(+v.toPrecision(a>=1?8:6))};
+const cls=(el,v)=>{el.classList.toggle('pos',v>0);el.classList.toggle('neg',v<0)};
+
+// ---- slider <-> price sync ----
+function fromSlider(k){const e=num($('e'+k)),s=+$('s'+k).value;if(e>0)$('f'+k).value=fmtP(e*(1+s/100));calc()}
+function fromFuture(k){const e=num($('e'+k)),f=num($('f'+k));if(e>0&&f>=0){const p=(f/e-1)*100;$('s'+k).value=Math.max(PMIN,Math.min(PMAX,Math.round(p)))}calc()}
+function fromEntry(k){fromSlider(k)}
+for(const k of['A','B']){
+ $('s'+k).addEventListener('input',()=>fromSlider(k));
+ $('f'+k).addEventListener('input',()=>fromFuture(k));
+ $('e'+k).addEventListener('input',()=>fromEntry(k));
+ $('id'+k).addEventListener('input',()=>{$('sym'+k).textContent=$('id'+k).value.trim()||'?'});
+}
+for(const id of['dep','apr','days'])$(id).addEventListener('input',calc);
+
+// ---- core math ----
+const il=r=>2*Math.sqrt(r)/(1+r)-1;
+function calc(){
+ const D=num($('dep')),eA=num($('eA')),eB=num($('eB')),fA=num($('fA')),fB=num($('fB'));
+ const apr=Math.max(0,num($('apr'))||0),days=Math.max(0,num($('days'))||0);
+ for(const k of['A','B']){const e=num($('e'+k)),f=num($('f'+k)),el=$('p'+k);const p=e>0&&f>=0?(f/e-1)*100:NaN;el.textContent=pct(p,1);cls(el,p)}
+ const ok=D>0&&eA>0&&eB>0&&fA>0&&fB>0;
+ if(!ok){for(const id of['oH','oL','oI','oF','oN','oB'])$(id).textContent='–';for(const id of['oH2','oL2','oI2','oF2','oN2','oB2'])$(id).textContent='';$('oI2').textContent='Enter a deposit and positive prices.';draw(NaN);return}
+ const qA=D/2/eA,qB=D/2/eB;
+ const hodl=qA*fA+qB*fB;
+ const r=(fA/eA)/(fB/eB);
+ const ilp=il(r);
+ const lp=hodl*(1+ilp);
+ const ilUsd=lp-hodl;
+ const fees=D*apr/100*days/365;
+ const net=lp+fees-hodl;
+ // LP token amounts after rebalancing: x*y=k, price ratio fA/fB
+ const k=qA*qB,nA=Math.sqrt(k*fB/fA),nB=Math.sqrt(k*fA/fB);
+ const sA=$('symA').textContent,sB=$('symB').textContent;
+ $('oH').textContent=usd(hodl);$('oH2').textContent=sUsd(hodl-D)+' vs deposit · '+fmtQ(qA)+' '+sA+' + '+fmtQ(qB)+' '+sB;
+ $('oL').textContent=usd(lp);$('oL2').textContent=sUsd(lp-D)+' vs deposit · '+fmtQ(nA)+' '+sA+' + '+fmtQ(nB)+' '+sB;
+ const iEl=$('oI');iEl.textContent=pct(ilp*100,3);cls(iEl,ilp<-1e-12?-1:0);$('oI2').textContent=sUsd(ilUsd)+' vs HODL · ratio change '+pct((r-1)*100,1);
+ const fEl=$('oF');fEl.textContent=usd(fees);cls(fEl,fees);$('oF2').textContent=apr+'% APR over '+days+' day'+(days==1?'':'s');
+ const nEl=$('oN');nEl.textContent=sUsd(net);cls(nEl,net);$('oN2').textContent='LP + fees = '+usd(lp+fees)+' · '+pct(net/hodl*100)+' vs HODL';
+ const bEl=$('oB');
+ if(Math.abs(ilUsd)<1e-9){bEl.textContent='0%';$('oB2').textContent='No IL in this scenario: any fee APR beats HODL.'}
+ else if(days<=0){bEl.textContent='∞';$('oB2').textContent='Set days held > 0 to compute.'}
+ else{const be=(-ilUsd)/D/(days/365)*100;bEl.textContent=be.toFixed(2)+'%';$('oB2').textContent='Fee APR needed over '+days+' days to cover IL'+(apr>=be?' · your APR covers it ✓':' · your APR falls short')}
+ cls(bEl,0);
+ draw(r);
+}
+const fmtQ=q=>{if(!isFinite(q))return'–';const a=Math.abs(q);return q.toLocaleString('en-US',{maximumFractionDigits:a>=1000?2:a>=1?4:8})};
+
+// ---- chart ----
+const cv=$('cv'),cx=cv.getContext('2d');
+function draw(r){
+ const W=cv.width,H=cv.height,L=64,R=20,T=20,B=44,pw=W-L-R,ph=H-T-B;
+ const yMin=-60,yMax=0; // IL at r=0.1 is ~-42.5%, at r=6 ~-30%
+ const X=x=>L+(x-PMIN)/(PMAX-PMIN)*pw,Y=y=>T+(yMax-y)/(yMax-yMin)*ph;
+ cx.clearRect(0,0,W,H);cx.fillStyle='#000';cx.fillRect(0,0,W,H);
+ cx.font='13px ui-monospace,Menlo,Consolas,monospace';cx.lineWidth=1;
+ // grid
+ cx.strokeStyle='#16201a';cx.fillStyle='#7a8a80';cx.textAlign='right';cx.textBaseline='middle';
+ for(let y=yMin;y<=yMax;y+=10){cx.beginPath();cx.moveTo(L,Y(y));cx.lineTo(W-R,Y(y));cx.stroke();cx.fillText(y+'%',L-8,Y(y))}
+ cx.textAlign='center';cx.textBaseline='top';
+ for(const x of[-90,0,100,200,300,400,500]){cx.beginPath();cx.moveTo(X(x),T);cx.lineTo(X(x),T+ph);cx.stroke();cx.fillText((x>0?'+':'')+x+'%',X(x),T+ph+8)}
+ cx.strokeStyle='#2a3a30';cx.beginPath();cx.moveTo(X(0),T);cx.lineTo(X(0),T+ph);cx.stroke();
+ // curve with gradient fill
+ const g=cx.createLinearGradient(0,T,0,T+ph);g.addColorStop(0,'rgba(93,255,176,.02)');g.addColorStop(1,'rgba(167,139,250,.28)');
+ cx.beginPath();cx.moveTo(X(PMIN),Y(0));
+ const pts=[];for(let i=0;i<=600;i++){const x=PMIN+(PMAX-PMIN)*i/600;pts.push([X(x),Y(il(1+x/100)*100)])}
+ pts.forEach(p=>cx.lineTo(p[0],p[1]));cx.lineTo(X(PMAX),Y(0));cx.closePath();cx.fillStyle=g;cx.fill();
+ const sg=cx.createLinearGradient(L,0,W-R,0);sg.addColorStop(0,'#a78bfa');sg.addColorStop(.25,'#5dffb0');sg.addColorStop(1,'#a78bfa');
+ cx.strokeStyle=sg;cx.lineWidth=3;cx.beginPath();pts.forEach((p,i)=>i?cx.lineTo(p[0],p[1]):cx.moveTo(p[0],p[1]));cx.stroke();
+ // marker
+ let note='';
+ if(isFinite(r)&&r>0){
+  const xr=(r-1)*100,xc=Math.max(PMIN,Math.min(PMAX,xr)),yv=il(r)*100,yc=il(1+xc/100)*100;
+  if(xc!==xr)note=' (outside the chart range, pinned to the edge)';
+  const px=X(xc),py=Y(Math.max(yMin,yc));
+  cx.strokeStyle='rgba(93,255,176,.5)';cx.setLineDash([4,4]);cx.lineWidth=1;
+  cx.beginPath();cx.moveTo(px,T+ph);cx.lineTo(px,py);cx.lineTo(L,py);cx.stroke();cx.setLineDash([]);
+  cx.fillStyle='#5dffb0';cx.shadowColor='#5dffb0';cx.shadowBlur=14;cx.beginPath();cx.arc(px,py,7,0,7);cx.fill();cx.shadowBlur=0;
+  cx.strokeStyle='#04130b';cx.lineWidth=2;cx.stroke();
+  const lbl='r '+pct(xr,1)+' → IL '+yv.toFixed(2)+'%';
+  cx.font='bold 14px ui-monospace,Menlo,Consolas,monospace';const tw=cx.measureText(lbl).width+16;
+  let bx=px+12,by=py-36;if(bx+tw>W-R)bx=px-12-tw;if(by<T)by=py+12;
+  cx.fillStyle='rgba(14,20,17,.92)';cx.strokeStyle='#2b5a40';cx.lineWidth=1;cx.beginPath();cx.roundRect?cx.roundRect(bx,by,tw,24,6):cx.rect(bx,by,tw,24);cx.fill();cx.stroke();
+  cx.fillStyle='#e8f0ea';cx.textAlign='left';cx.textBaseline='middle';cx.fillText(lbl,bx+8,by+12);
+ }
+ $('clampNote').textContent=note;
+ cx.fillStyle='rgba(255,255,255,.3)';cx.font='11px ui-monospace,Menlo,Consolas,monospace';cx.textAlign='right';cx.textBaseline='bottom';cx.fillText('anonymusk',W-R-4,T+ph-4);
+}
+
+// ---- CoinGecko fetch ----
+const st=$('st'),btn=$('fetch');
+async function fetchPrices(){
+ const a=$('idA').value.trim().toLowerCase(),b=$('idB').value.trim().toLowerCase();
+ if(!a||!b){st.className='err';st.textContent='Enter both CoinGecko ids.';return}
+ btn.disabled=true;st.className='muted';st.innerHTML='<span class="spin"></span>fetching from CoinGecko…';
+ const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),12000);
+ try{
+  const u='https://api.coingecko.com/api/v3/simple/price?ids='+encodeURIComponent(a+','+b)+'&vs_currencies=usd';
+  const res=await fetch(u,{signal:ctl.signal,headers:{Accept:'application/json'}});
+  if(res.status===429)throw Error('rate-limited by CoinGecko (HTTP 429), wait a minute and retry');
+  if(!res.ok)throw Error('HTTP '+res.status);
+  const d=await res.json(),pa=d?.[a]?.usd,pb=d?.[b]?.usd;
+  const miss=[[a,pa],[b,pb]].filter(x=>typeof x[1]!=='number').map(x=>'"'+x[0]+'"');
+  if(miss.length)throw Error('no USD price for '+miss.join(' and ')+'; check the CoinGecko id (e.g. "ethereum", not "ETH")');
+  $('eA').value=fmtP(pa);$('eB').value=fmtP(pb);$('sA').value=0;$('sB').value=0;fromSlider('A');fromSlider('B');
+  st.className='muted';st.textContent='✓ '+a+' $'+fmtP(pa)+' · '+b+' $'+fmtP(pb)+' · CoinGecko · '+new Date().toLocaleTimeString();
+ }catch(e){
+  st.className='err';st.textContent='Could not fetch prices: '+(e.name==='AbortError'?'request timed out':e.message)+'. You can still type prices manually.';
+ }finally{clearTimeout(to);btn.disabled=false}
+}
+btn.addEventListener('click',fetchPrices);
+['idA','idB'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')fetchPrices()}));
+
+// ---- email capture ----
+const form=$('capture'),capMsg=$('capMsg'),capBtn=$('capBtn');
+form.addEventListener('submit',async e=>{
+ const email=form.email.value.trim();
+ if(form.action.includes('YOUR_FORMSPREE_ID')){
+  e.preventDefault();
+  location.href='mailto:anonymusk@mail.grokbot.com?subject='+encodeURIComponent('Subscribe: impermanent-loss')+'&body='+encodeURIComponent('Please add '+email+' to the anonymusk free-tools list.');
+  capMsg.className='muted';capMsg.textContent='Opening your email app. Send the pre-filled message to subscribe.';
+  return;
+ }
+ e.preventDefault();capBtn.disabled=true;capMsg.className='muted';capMsg.textContent='Sending…';
+ try{
+  const res=await fetch(form.action,{method:'POST',body:new FormData(form),headers:{Accept:'application/json'}});
+  if(!res.ok){let m='HTTP '+res.status;try{const j=await res.json();if(j?.errors?.length)m=j.errors.map(x=>x.message).join(', ')}catch(_){}throw Error(m)}
+  form.reset();capMsg.className='pos';capMsg.textContent='Thanks, you are on the list. New tools land in your inbox.';
+ }catch(err){capMsg.className='neg';capMsg.textContent='Could not subscribe ('+err.message+'). Please try again later.'}
+ finally{capBtn.disabled=false}
+});
+
+// ---- init ----
+calc();
+window.addEventListener('load',fetchPrices);
+})();
+</script>
+</body>
+</html>
