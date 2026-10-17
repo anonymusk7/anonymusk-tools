@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Deck in 24h: crypto pitch decks | anonymusk</title>
-<meta name="description" content="Crypto pitch decks for token launches and DeFi raises. Grab the $39 template pack or get a custom, fully editable PowerPoint deck in 24 hours.">
+<meta name="description" content="Crypto pitch decks for token launches and DeFi raises. Grab the $29 template pack or get a custom, fully editable PowerPoint deck in 24 hours.">
 <meta property="og:title" content="Deck in 24h: crypto pitch decks | anonymusk"><meta property="og:description" content="Editable .pptx decks for memecoins, token launches and DeFi raises. Template pack or done-for-you in 24h.">
 <meta property="og:image" content="https://anonymusk7.github.io/anonymusk-tools/decks/pupsol-solana-meme-launch-deck-1.jpg"><meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="style.css">
@@ -50,7 +50,7 @@ h3.big{font-size:clamp(1.5rem,3vw,2.1rem);margin:0 0 18px;letter-spacing:-.01em}
   <span class="eyebrow">Deck in 24h</span>
   <h1>Crypto pitch decks, <span class="grad">shipped by tomorrow.</span></h1>
   <p class="lead">Decks for memecoin launches, token sales and DeFi raises, delivered as fully editable PowerPoint files. Grab the template pack and fill it in yourself, or send a brief and get a custom deck within 24 hours.</p>
-  <div style="margin-top:22px"><a class="btn" data-gumroad href="#">Get the template pack: $39</a><a class="btn ghost" href="#pricing">Custom deck in 24h</a></div>
+  <div style="margin-top:22px"><a class="btn" data-gumroad href="#">Get the template pack: $29</a><a class="btn ghost" href="#pricing">Custom deck in 24h</a></div>
   <div class="stats"><div><b>.pptx</b>native shapes, editable text</div><div><b>16:9</b>Google Slides / Keynote friendly</div><div><b>24h</b>custom turnaround</div></div>
  </div>
  <div class="stack" aria-label="Sample deck slides">
@@ -73,7 +73,7 @@ h3.big{font-size:clamp(1.5rem,3vw,2.1rem);margin:0 0 18px;letter-spacing:-.01em}
  <h2 class="sec">Pricing</h2><h3 class="big">Fill it in yourself, or let us build it</h3>
  <div class="offers">
   <div class="offer">
-   <h4>Crypto Pitch Deck Templates</h4><div class="price">$39 <small>one-time</small></div><p class="sub">Use it right away. Do it yourself in an afternoon.</p>
+   <h4>Crypto Pitch Deck Templates</h4><div class="price">$29 <small>one-time</small></div><p class="sub">Use it right away. Do it yourself in an afternoon.</p>
    <ul><li>Token launch deck (10 slides)</li><li>Memecoin / community launch deck (8 slides)</li><li>DeFi protocol investor deck (10 slides)</li><li>Every slide editable in PowerPoint, Google Slides and Keynote</li><li>[BRACKET] placeholders plus a fill-in guide</li><li>Free updates when new templates are added</li></ul>
    <a class="btn" data-gumroad href="#">Buy on Gumroad</a>
   </div>
@@ -115,7 +115,7 @@ h3.big{font-size:clamp(1.5rem,3vw,2.1rem);margin:0 0 18px;letter-spacing:-.01em}
 /* Gumroad product link for the "Crypto Pitch Deck Templates" pack.
    PLACEHOLDER: points at the anonymusk Gumroad storefront until the product exists.
    Replace with the product URL, e.g. 'https://anonymusk.gumroad.com/l/<slug>'. */
-const GUMROAD_DECK_PACK='https://anonymusk.gumroad.com/';
+const GUMROAD_DECK_PACK='https://anonymusk.gumroad.com/l/vmpnxc';
 document.querySelectorAll('[data-gumroad]').forEach(a=>{a.href=GUMROAD_DECK_PACK;a.target='_blank';a.rel='noopener'});
 const lb=document.getElementById('lb'),lbi=lb.querySelector('img');lb.onclick=()=>lb.style.display='none';
 document.querySelectorAll('.deckrow').forEach(r=>{for(let i=1;i<=+r.dataset.n;i++){const im=new Image();im.src=`decks/${r.dataset.deck}-${i}.jpg`;im.loading='lazy';im.alt=`Slide ${i}`;im.onclick=()=>{lbi.src=im.src;lb.style.display='grid'};r.appendChild(im)}});
