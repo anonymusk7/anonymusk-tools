@@ -35,7 +35,7 @@ function draw(c,t){const W=1080,H=1080;const up=(D.ch||0)>=0,hue=up?150:350;bg(c
 async function go(){st.textContent='loading…';try{D=await load(q.value);IMG=null;if(D.img){IMG=new Image();IMG.crossOrigin='anonymous';IMG.onerror=()=>IMG=null;IMG.src=D.img}st.textContent=D.name+' loaded from '+D.src;stop&&stop();stop=loop(cv,draw,15);rec.disabled=false}catch(e){st.textContent='Could not find token ('+e.message+'). Try a contract address.'}}
 /* ===== freemium ===== */
 // >>> Paste your real Gumroad product URL here (see plays/03-freemium/README.md) <<<
-const GUMROAD_HD_URL='https://anonymusk.gumroad.com/l/REPLACE_ME_launch_clip_hd';
+const GUMROAD_HD_URL='https://anonymusk.gumroad.com/l/aizgtk';
 const GUMROAD_STORE='https://anonymusk.gumroad.com/';
 const LK='amk_launch_license';
 // v1 client-side check: Gumroad license format, or a hand-issued AMK- code with checksum. Obscurity, not security.
