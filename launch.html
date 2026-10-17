@@ -1,5 +1,14 @@
-<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width"><title>Token → 15s launch clip | anonymusk</title><link rel=stylesheet href=style.css><script src=common.js></script><main><h1>🚀 Token → 15s launch clip</h1><p class=muted>CoinGecko id (e.g. <code>pepe</code>), symbol, or contract address (DexScreener). Live data, rendered in your browser.</p>
-<div class=row><input id=q value=pepe size=40><button id=go>Load</button><button id=rec disabled>Download 15s .webm</button></div><div id=st class=muted></div><canvas id=cv width=1080 height=1080></canvas></main>
+<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width"><title>Token → 15s launch clip | anonymusk</title><link rel=stylesheet href=style.css><style>.pro{border-color:#2b5a40;background:linear-gradient(135deg,#0c1712,#0e1020)}.pro h2{margin:.1em 0 .4em;font-size:1.3rem}.cmp{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:12px}.cmp>div{background:#0a0f0c;border:1px solid #1d2a22;border-radius:12px;padding:10px 14px}.cmp ul{margin:.3em 0;padding-left:1.1em}.acc{color:#5dffb0}.btn{display:inline-block;background:linear-gradient(90deg,#5dffb0,#7a8cff);color:#04130b;font-weight:800;padding:10px 18px;border-radius:10px;text-decoration:none}.pill{font-size:.8rem;padding:4px 10px;border-radius:99px;border:1px solid #2a3a30;color:#9fb}.pill.hd{border-color:#5dffb0;color:#5dffb0}@media(max-width:600px){.cmp{grid-template-columns:1fr}}</style><script src=common.js></script><main><h1>🚀 Token → 15s launch clip</h1><p class=muted>CoinGecko id (e.g. <code>pepe</code>), symbol, or contract address (DexScreener). Live data, rendered in your browser.</p>
+<div class=row><input id=q value=pepe size=40><button id=go>Load</button><button id=rec disabled>Download 15s .webm</button><span id=tier class=pill></span></div><div id=st class=muted></div><canvas id=cv width=1080 height=1080></canvas>
+<div class="card pro" id=pro>
+ <h2>⚡ Launch Clip HD: no watermark, 1080p</h2>
+ <div class=cmp><div><b>Free</b><ul><li>720×720 export</li><li>Visible <code>anonymusk</code> watermark</li><li>4 Mbps .webm</li></ul></div><div><b class=acc>HD unlock</b><ul><li>1080×1080 export</li><li><b>No watermark</b>, your brand only</li><li>10 Mbps .webm, ready for X/TG</li><li>Unlimited clips, any token</li></ul></div></div>
+ <div class=row><a id=buy class=btn target=_blank rel=noopener>Unlock HD on Gumroad →</a><span class=muted>One-time payment. Your license key comes in the Gumroad receipt.</span></div>
+ <div class=row style="margin-top:12px"><input id=lic placeholder="Paste license key (XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX)" size=44><button id=act>Activate</button></div>
+ <div id=lst class=muted></div>
+</div>
+<div class="card pro" id=proOn hidden><b class=acc>✓ HD unlocked</b>: 1080p exports with no watermark. <a href=# id=deact>Remove key from this browser</a></div>
+</main>
 <script>
 const cv=document.getElementById('cv'),st=document.getElementById('st');let D=null,stop=null;
 async function j(u){const r=await fetch(u);if(!r.ok)throw Error(r.status);return r.json()}
@@ -12,7 +21,7 @@ function fromPair(ps){if(!ps||!ps.length)throw Error('not found');const p=ps.sor
  const pts=[[0,c.h24],[18,c.h6],[23,c.h1],[23.9,c.m5],[24,0]].filter(x=>x[1]!=null).map(([h,v])=>[h,pr/(1+v/100)]);pts.push([24,pr]);
  const spark=[];for(let i=0;i<=48;i++){const h=i/2;let k=pts.findIndex(p=>p[0]>=h);if(k<=0){spark.push(pts[0][1]);continue}const a=pts[k-1],b=pts[k],u=(h-a[0])/(b[0]-a[0]||1);spark.push(a[1]+(b[1]-a[1])*u*(1+.04*Math.sin(i*1.7)))}
  return{name:p.baseToken.name,sym:p.baseToken.symbol,price:pr,mcap:p.marketCap||p.fdv,vol:p.volume?.h24,ch:c.h24,spark,img:p.info?.imageUrl,src:'DexScreener · '+p.chainId+'/'+p.dexId}}
-let IMG=null;
+let IMG=null,EXP=false;
 function draw(c,t){const W=1080,H=1080;const up=(D.ch||0)>=0,hue=up?150:350;bg(c,t,W,H,hue);const acc=up?'#5dffb0':'#ff5d7a';
  const a1=ease(t/1.2);if(IMG&&IMG.complete&&IMG.naturalWidth){c.save();c.globalAlpha=a1;c.beginPath();c.arc(W/2,190,90*a1,0,7);c.clip();c.drawImage(IMG,W/2-90,100,180,180);c.restore()}
  txt(c,'$'+D.sym,W/2,360,110*(0.6+0.4*a1),'#fff','center',a1);txt(c,D.name,W/2,415,36,'#9fb','center',a1);
@@ -22,7 +31,30 @@ function draw(c,t){const W=1080,H=1080;const up=(D.ch||0)>=0,hue=up?150:350;bg(c
  // chart
  const s=D.spark;if(s&&s.length>2&&t>7.5){const p=ease((t-7.5)/4),mn=Math.min(...s),mx=Math.max(...s),n=Math.floor(s.length*p);c.strokeStyle=acc;c.lineWidth=6;c.globalAlpha=.9;c.beginPath();for(let i=0;i<n;i++){const x=100+i/(s.length-1)*(W-200),y=1000-(s[i]-mn)/(mx-mn||1)*90;i?c.lineTo(x,y):c.moveTo(x,y)}c.stroke();c.globalAlpha=1}
  if(t>12.5){const a=ease((t-12.5)/.8);c.fillStyle=`rgba(0,0,0,${.75*a})`;c.fillRect(0,0,W,H);txt(c,'$'+D.sym,W/2,480,140,acc,'center',a);txt(c,'LIVE · '+new Date().toISOString().slice(0,10),W/2,560,36,'#fff','center',a)}
- txt(c,'data: '+D.src,30,H-30,18,'rgba(255,255,255,.35)','left');wm(c,W,H)}
+ txt(c,'data: '+D.src,30,H-30,18,'rgba(255,255,255,.35)','left');if(!isPro()&&!EXP)bigWM(c,W,H,t)}
 async function go(){st.textContent='loading…';try{D=await load(q.value);IMG=null;if(D.img){IMG=new Image();IMG.crossOrigin='anonymous';IMG.onerror=()=>IMG=null;IMG.src=D.img}st.textContent=D.name+' loaded from '+D.src;stop&&stop();stop=loop(cv,draw,15);rec.disabled=false}catch(e){st.textContent='Could not find token ('+e.message+'). Try a contract address.'}}
-if(location.hash)q.value=decodeURIComponent(location.hash.slice(1));document.getElementById("go").onclick=go;rec.onclick=()=>{stop&&stop();recordCanvas(cv,draw,15,D.sym+'-launch',rec)};go();
+/* ===== freemium ===== */
+// >>> Paste your real Gumroad product URL here (see plays/03-freemium/README.md) <<<
+const GUMROAD_HD_URL='https://anonymusk.gumroad.com/l/REPLACE_ME_launch_clip_hd';
+const GUMROAD_STORE='https://anonymusk.gumroad.com/';
+const LK='amk_launch_license';
+// v1 client-side check: Gumroad license format, or a hand-issued AMK- code with checksum. Obscurity, not security.
+function h32(s){let h=2166136261;for(const ch of s){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)>>>0}return h}
+function validKey(k){k=(k||'').trim().toUpperCase();if(/^[0-9A-F]{8}(-[0-9A-F]{8}){3}$/.test(k))return true;const m=k.match(/^AMK-([0-9A-Z]{6})-([0-9A-F]{4})$/);return!!m&&(h32('anonymusk:'+m[1])&0xffff).toString(16).toUpperCase().padStart(4,'0')===m[2]}
+function isPro(){try{return validKey(localStorage.getItem(LK))}catch(e){return false}}
+function bigWM(c,W,H,t){c.save();c.globalAlpha=.16;c.fillStyle='#fff';c.font='900 64px Inter,system-ui,sans-serif';c.textAlign='center';c.translate(W/2,H/2);c.rotate(-Math.PI/7);for(let y=-900;y<=900;y+=260)for(let x=-900;x<=900;x+=520)c.fillText('anonymusk',x+(y/260%2?260:0),y);c.restore();
+ c.save();c.fillStyle='rgba(0,0,0,.6)';c.fillRect(0,22,W,58);c.restore();txt(c,'made free with anonymusk · anonymusk7.github.io/anonymusk-tools',W/2,62,26,'#5dffb0','center',.95)}
+function refreshTier(){const p=isPro();tier.textContent=p?'HD · no watermark':'FREE · 720p · watermarked';tier.className='pill'+(p?' hd':'');pro.hidden=p;proOn.hidden=!p;rec.textContent=p?'Download 15s HD .webm':'Download 15s .webm (free, watermarked)'}
+function activate(k,quiet){k=(k||'').trim().toUpperCase();if(validKey(k)){localStorage.setItem(LK,k);lst.textContent='';refreshTier();return true}if(!quiet)lst.textContent='That key does not look valid. Copy it exactly from your Gumroad receipt.';return false}
+buy.href=GUMROAD_HD_URL.includes('REPLACE_ME')?GUMROAD_STORE:GUMROAD_HD_URL;
+act.onclick=()=>activate(lic.value);deact.onclick=e=>{e.preventDefault();localStorage.removeItem(LK);refreshTier()};
+{const u=new URLSearchParams(location.search),k=u.get('license')||u.get('key');if(k){activate(k);u.delete('license');u.delete('key');history.replaceState(null,'',location.pathname+(u.toString()?'?'+u:'')+location.hash)}}
+refreshTier();
+// export: free = 720p + watermark (drawn in the MediaRecorder canvas path), pro = 1080p clean
+function exportClip(){const p=isPro(),S=p?1080:720,out=document.createElement('canvas');out.width=out.height=S;const oc=out.getContext('2d'),src=document.createElement('canvas');src.width=src.height=1080;
+ EXP=true;const drawOut=(c,t)=>{draw(src.getContext('2d'),t);c.drawImage(src,0,0,S,S);if(!p){c.save();c.scale(S/1080,S/1080);bigWM(c,1080,1080,t);c.restore()}cv.getContext('2d').drawImage(out,0,0,1080,1080)};
+ const s=out.captureStream(30),mt=['video/webm;codecs=vp9','video/webm'].find(m=>MediaRecorder.isTypeSupported(m)),r=new MediaRecorder(s,{mimeType:mt,videoBitsPerSecond:p?1e7:4e6}),ch=[];
+ r.ondataavailable=e=>ch.push(e.data);r.onstop=()=>{EXP=false;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(ch,{type:'video/webm'}));a.download=D.sym+'-launch'+(p?'-hd':'-free')+'.webm';a.click();rec.disabled=false;st.textContent='Exported '+(p?'1080p HD':'720p free (watermarked)')+' clip.';stop=loop(cv,draw,15)};
+ rec.disabled=true;st.textContent='Recording 15s'+(p?' HD':'')+'… keep this tab visible.';r.start();const t0=performance.now();(function f(){const t=(performance.now()-t0)/1000;drawOut(oc,Math.min(t,15));if(t<15)requestAnimationFrame(f);else setTimeout(()=>r.stop(),100)})()}
+if(location.hash)q.value=decodeURIComponent(location.hash.slice(1));document.getElementById("go").onclick=go;rec.onclick=()=>{stop&&stop();exportClip()};go();
 </script>
