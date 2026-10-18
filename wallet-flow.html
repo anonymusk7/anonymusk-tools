@@ -1,27 +1,39 @@
 <!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
 <title>Wallet fund-flow graph: where did the money go? | anonymusk</title>
+<meta property="og:title" content="Wallet fund-flow graph: where did the money go? | anonymusk"><meta property="og:type" content="website">
+<meta name="theme-color" content="#07080c">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><link rel="icon" href="favicon.ico" sizes="32x32"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta property="og:image" content="https://anonymusk7.github.io/anonymusk-tools/assets/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://anonymusk7.github.io/anonymusk-tools/assets/og.png">
+<link rel="preload" href="assets/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/anon.css"><script src="assets/anon.js" defer></script>
+
 <meta name=description content="Free animated fund-flow graph for any EVM wallet. See counterparties, inflows and outflows in USD, exchange labels, a replayable timeline, and expand any counterparty. Blockscout data, runs in your browser.">
-<meta name=theme-color content="#07090c">
-<link rel=stylesheet href=style.css><script src=common.js></script>
+
+<script src=common.js></script>
 <script src="https://cdn.jsdelivr.net/npm/force-graph@1/dist/force-graph.min.js"></script>
 <style>
 main{max-width:1200px}
-.lay{display:grid;grid-template-columns:1fr 320px;gap:12px}@media(max-width:860px){.lay{grid-template-columns:1fr}}
-#graph{position:relative;height:600px;background:#000;border:1px solid #1d2a22;border-radius:14px;overflow:hidden}@media(max-width:600px){#graph{height:440px}}
-#ov{position:absolute;inset:0;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;background:rgba(7,9,12,.85);z-index:5;text-align:center;padding:20px}#ov[hidden]{display:none}
-.side{max-height:600px;overflow:auto}.side .card{margin:0 0 10px}
-.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.85rem;word-break:break-all}
-table{width:100%;border-collapse:collapse;font-size:.85rem}td{padding:4px;border-bottom:1px solid #1d2a22}td:last-child{text-align:right;font-family:ui-monospace,Menlo,monospace}
-tr.c{cursor:pointer}tr.c:hover td{background:#101612}
-.in{color:#5dffb0}.out{color:#ff5d7a}.err{color:#ff8a9e}
-.seg{display:inline-flex;border:1px solid #2a3a30;border-radius:10px;overflow:hidden}.seg button{background:#101612;color:#9fb;border-radius:0;padding:6px 12px;font-weight:700}.seg button[aria-pressed=true]{background:linear-gradient(90deg,#5dffb0,#7a8cff);color:#04130b}
+.lay{display:grid;grid-template-columns:1fr 320px;gap:12px}
+@media(max-width:860px){.lay{grid-template-columns:1fr}}
+#graph{position:relative;height:600px;background:var(--bg-inset);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+@media(max-width:600px){#graph{height:440px}}
+#ov{position:absolute;inset:0;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;background:rgba(7,9,12,.85);z-index:5;text-align:center;padding:20px}
+#ov[hidden]{display:none}
+.side{max-height:600px;overflow:auto}
+.side .card{margin:0 0 10px}
+.mono{font-family:var(--mono);font-size:.85rem;word-break:break-all}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+td{padding:4px;border-bottom:1px solid var(--border)}
+td:last-child{text-align:right;font-family:var(--mono)}
+tr.c{cursor:pointer}
+.in{color:var(--up)}
+.out{color:var(--down)}
 #addr{flex:1;min-width:min(420px,100%)}
-#tl{width:100%;accent-color:#5dffb0;padding:0}
-.btn2{background:#101612;color:#5dffb0;border:1px solid #2a3a30;padding:8px 14px}
-.pro{border-color:#2b5a40;background:linear-gradient(135deg,#0c1712,#0e1020)}
-.pill{font-size:.75rem;padding:2px 8px;border-radius:99px;border:1px solid #2a3a30;color:#9fb}
-</style></head><body><main>
-<h1>🌊 Wallet fund-flow graph</h1>
+#tl{width:100%;accent-color:var(--accent-text);padding:0}
+</style></head><body><a class="skip" href="#main">Skip to content</a>
+<header class="site-header"><div class="sh-in"><a class="brand" href="./" aria-label="anonymusk tools home"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="amk-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7d6eff"/><stop offset="1" stop-color="#3fc59f"/></linearGradient></defs><rect width="32" height="32" rx="8" fill="url(#amk-g)"/><path d="M9 22.5 15.2 8.8a1 1 0 0 1 1.8 0L23 22.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.6 17.4c2.9-1.5 5.9-1.5 8.8 0" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg><span class="w">anony<b>musk</b></span></a><nav class="site-nav" aria-label="Main"><a href="./#tools" aria-current="page">Tools</a><a href="launch.html">Launch clips</a><a href="decks.html">Decks</a><a href="service.html" class="cta-link">Service</a></nav></div></header>
+<main id="main">
+<div class="crumbs"><a href="./#tools">Tools</a><span aria-hidden="true">/</span><span>Wallet</span></div><h1>Wallet fund-flow graph</h1>
 <p class=muted>Paste a wallet. See who it sends to and receives from, sized by USD, with exchange and protocol labels. Press ▶ to replay the flows in time order. Click a counterparty to expand its flows too.</p>
 <div class="card row">
  <select id=chain aria-label=Chain><option value=eth>Ethereum</option><option value=base>Base</option><option value=arbitrum>Arbitrum</option><option value=optimism>Optimism</option></select>
@@ -46,6 +58,15 @@ tr.c{cursor:pointer}tr.c:hover td{background:#101612}
 <div class=card style="font-size:.85rem"><b>How it works & limits.</b> Data: <a href="https://eth.blockscout.com/" target=_blank rel=noopener>Blockscout</a> public API (v2 address transactions and token transfers, latest ~100 of each per wallet, plus Blockscout's address tags for exchange/protocol names). USD uses Blockscout's <i>current</i> token and coin prices, not the price at transfer time, so old flows are approximate. Tokens without a price count as $0. Internal transactions (contract-made ETH sends) are not included. Green = into the traced wallet(s), red = out. Labels are Blockscout's, not ours. Throttled to about 4 requests/s with back-off on HTTP 429.</div>
 <p class=muted style="font-size:.85rem">Not financial advice. A transfer is not proof of who controls an address. Verify on a block explorer.</p>
 </main>
+<footer class="site-footer"><div class="sf-in">
+ <div><a class="brand" href="./"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="amk-g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7d6eff"/><stop offset="1" stop-color="#3fc59f"/></linearGradient></defs><rect width="32" height="32" rx="8" fill="url(#amk-g2)"/><path d="M9 22.5 15.2 8.8a1 1 0 0 1 1.8 0L23 22.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.6 17.4c2.9-1.5 5.9-1.5 8.8 0" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg><span class="w">anony<b>musk</b></span></a><p>Free, in-browser crypto tools. No sign-up, no API keys, no trackers. Built by <a href="https://anonymusk7.github.io/anonymusk/">anonymusk</a>.</p></div>
+ <div><h4>Tools</h4><ul><li><a href="crypto-heatmap.html">Market heatmap</a></li><li><a href="trending.html">Hot token board</a></li><li><a href="holder-map.html">Holder bubble map</a></li><li><a href="wallet-flow.html">Wallet fund-flow</a></li><li><a href="defi-yield-finder.html">DeFi yield finder</a></li><li><a href="./#tools">All tools →</a></li></ul></div>
+ <div><h4>Products</h4><ul><li><a href="report.html">Wallet audit report</a></li><li><a href="launch.html">Launch Clip HD</a></li><li><a href="https://anonymusk.gumroad.com/l/vmpnxc">Pitch deck pack $29</a></li><li><a href="https://anonymusk.gumroad.com/l/sztuha">Motion pack $29</a></li><li><a href="https://anonymusk.gumroad.com/l/ksgvlu">Launch kit $79</a></li></ul></div>
+ <div><h4>Studio</h4><ul><li><a href="service.html">Done-for-you launch videos</a></li><li><a href="decks.html">Pitch deck in 24h</a></li><li><a href="https://anonymusk7.github.io/anonymusk/">Portfolio</a></li><li><a href="https://anonymusk.gumroad.com/">Gumroad store</a></li></ul></div>
+</div>
+<div class="legal"><span><b>Not financial advice.</b> Educational tools only. Data can be delayed, incomplete or wrong. Do your own research.</span><span>Data: CoinGecko · GeckoTerminal · DefiLlama · Blockscout · alternative.me · DexScreener · public RPCs. Each tool credits its sources on the page.</span></div>
+</footer>
+
 <script>
 'use strict';
 const HOSTS={eth:'https://eth.blockscout.com',base:'https://base.blockscout.com',arbitrum:'https://arbitrum.blockscout.com',optimism:'https://optimism.blockscout.com'};
@@ -102,18 +123,18 @@ function view(){
 }
 const name=a=>a?.label||a?.entity||short(a?.addr||a?.id);
 const R=n=>n.base?12:Math.max(3,Math.min(16,2+Math.log10(1+n.vol)*1.6));
-const col=n=>n.base?'#ffe45d':n.a?.type==='cex'?'#7a8cff':n.a?.type==='deposit'?'#5dd8ff':n.a?.contract?'#c55dff':n.exp?'#ffb35d':'#7a8a80';
+const col=n=>n.base?'#ffe45d':n.a?.type==='cex'?'#8b7cff':n.a?.type==='deposit'?'#5dd8ff':n.a?.contract?'#c55dff':n.exp?'#ffb35d':'#8a91a5';
 function render(){
  const V=view();$('ov').hidden=true;const el=$('graph');
  if(!G){G=ForceGraph()(el).backgroundColor('#000').nodeId('id').cooldownTime(5000)
-  .nodeLabel(n=>`<div style="background:#0b100dee;border:1px solid #2b5a40;border-radius:10px;padding:6px 10px;font:13px Inter,system-ui"><b>${esc(name(n.a))}</b><br><span style="color:#9fb">${esc(short(n.a?.addr))}${n.a?.type?' · '+esc(n.a.type):n.a?.contract?' · contract':''}</span></div>`)
+  .nodeLabel(n=>`<div style="background:#10121bee;border:1px solid #3b3570;border-radius:10px;padding:6px 10px;font:13px Inter,system-ui"><b>${esc(name(n.a))}</b><br><span style="color:#9fb">${esc(short(n.a?.addr))}${n.a?.type?' · '+esc(n.a.type):n.a?.contract?' · contract':''}</span></div>`)
   .nodeCanvasObject((n,ctx,s)=>{const r=R(n);ctx.beginPath();ctx.arc(n.x,n.y,r,0,7);ctx.fillStyle=col(n);ctx.globalAlpha=.9;ctx.fill();ctx.globalAlpha=1;if(n===SEL||n.base){ctx.strokeStyle='#fff';ctx.lineWidth=1.5/s;ctx.stroke()}
-   if(n.base||r*s>9||n===SEL){ctx.font=`${11/s}px Inter,system-ui`;ctx.fillStyle='#e8f0ea';ctx.textAlign='center';ctx.fillText(name(n.a).slice(0,22),n.x,n.y+r+11/s)}})
+   if(n.base||r*s>9||n===SEL){ctx.font=`${11/s}px Inter,system-ui`;ctx.fillStyle='#eef0f6';ctx.textAlign='center';ctx.fillText(name(n.a).slice(0,22),n.x,n.y+r+11/s)}})
   .nodePointerAreaPaint((n,c,ctx)=>{ctx.fillStyle=c;ctx.beginPath();ctx.arc(n.x,n.y,R(n)+3,0,7);ctx.fill()})
   .linkColor(l=>S.bases.has(l.target.id||l.target)&&!S.bases.has(l.source.id||l.source)?'rgba(93,255,176,.6)':S.bases.has(l.source.id||l.source)&&!S.bases.has(l.target.id||l.target)?'rgba(255,93,122,.6)':'rgba(200,200,200,.4)')
   .linkWidth(l=>Math.max(.6,Math.min(6,Math.log10(1+l.usd)-1))).linkCurvature(.15).linkDirectionalArrowLength(4).linkDirectionalArrowRelPos(.9)
   .linkDirectionalParticles(l=>Math.min(4,1+Math.floor(Math.log10(1+l.usd)/2))).linkDirectionalParticleSpeed(.006).linkDirectionalParticleWidth(2)
-  .linkLabel(l=>`<div style="background:#0b100dee;border:1px solid #2b5a40;border-radius:10px;padding:6px 10px;font:13px Inter,system-ui">${l.count} transfer${l.count>1?'s':''} · ${usd(l.usd)}<br>${Object.entries(l.syms).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([s,v])=>esc(s)+' '+usd(v)).join(' · ')}</div>`)
+  .linkLabel(l=>`<div style="background:#10121bee;border:1px solid #3b3570;border-radius:10px;padding:6px 10px;font:13px Inter,system-ui">${l.count} transfer${l.count>1?'s':''} · ${usd(l.usd)}<br>${Object.entries(l.syms).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([s,v])=>esc(s)+' '+usd(v)).join(' · ')}</div>`)
   .onNodeClick(n=>select(n));G.d3Force('charge').strength(-90);
   new ResizeObserver(()=>G.width(el.clientWidth).height(el.clientHeight)).observe(el)}
  G.width(el.clientWidth).height(el.clientHeight).graphData({nodes:V.nodes,links:V.links});

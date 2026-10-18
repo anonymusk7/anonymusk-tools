@@ -1,49 +1,65 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Deck in 24h: crypto pitch decks | anonymusk</title>
+<meta name="theme-color" content="#07080c">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><link rel="icon" href="favicon.ico" sizes="32x32"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta property="og:image" content="https://anonymusk7.github.io/anonymusk-tools/assets/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://anonymusk7.github.io/anonymusk-tools/assets/og.png">
+<link rel="preload" href="assets/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/anon.css"><script src="assets/anon.js" defer></script>
+
 <meta name="description" content="Crypto pitch decks for token launches and DeFi raises. Grab the $29 template pack or get a custom, fully editable PowerPoint deck in 24 hours.">
 <meta property="og:title" content="Deck in 24h: crypto pitch decks | anonymusk"><meta property="og:description" content="Editable .pptx decks for memecoins, token launches and DeFi raises. Template pack or done-for-you in 24h.">
 <meta property="og:image" content="https://anonymusk7.github.io/anonymusk-tools/decks/pupsol-solana-meme-launch-deck-1.jpg"><meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="style.css">
+
 <style>
-:root{--acc:#5dffb0;--acc2:#b98cff;--pink:#ff2d6f;--mut:#8a94a6;--line:#1f2533}
-html{scroll-behavior:smooth}main{max-width:1120px}
-body{background:radial-gradient(1100px 600px at 85% -10%,#1d1038 0,transparent 60%),radial-gradient(900px 500px at -10% 35%,#0d2a1f 0,transparent 55%),#07080d}
-nav{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:6px 0 18px}
-.logo{font-weight:900;letter-spacing:.04em;text-decoration:none;color:#e8f0ea;font-size:1.1rem}.logo span{color:var(--acc)}
-nav .links a{color:#c9d0dc;text-decoration:none;margin-left:18px;font-size:.95rem}nav .links a:hover{color:var(--acc)}
+:root{--acc:var(--accent-text);--acc2:var(--mint);--pink:#ff2d6f;--mut:var(--text-3);--line:var(--border)}
+main{max-width:1120px}
 .hero{display:grid;grid-template-columns:1fr 1.05fr;gap:34px;align-items:center;padding:24px 0 36px}
-.eyebrow{display:inline-block;font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--acc2);border:1px solid #3a2a5a;border-radius:99px;padding:5px 12px;background:#120c1f}
+.eyebrow{display:inline-block;font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--acc2);border:1px solid var(--border-strong);border-radius:99px;padding:5px 12px;background:var(--surface-2)}
 .hero h1{font-size:clamp(2.2rem,4.8vw,3.6rem);line-height:1.03;margin:.35em 0 .3em;letter-spacing:-.02em}
-.grad{background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
-.lead{color:#b9c1cf;font-size:1.12rem;max-width:46ch}
-.btn{display:inline-block;background:linear-gradient(90deg,var(--acc),var(--acc2));color:#08060f;font-weight:800;padding:12px 22px;border-radius:12px;text-decoration:none;border:0}
-.btn.ghost{background:none;color:#e8f0ea;border:1px solid #2c3344;margin-left:8px}.btn:hover{filter:brightness(1.08)}
+.grad{background:var(--accent);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:var(--text-2);font-size:1.12rem;max-width:46ch}
 .stack{position:relative;aspect-ratio:16/10}
 .stack img{position:absolute;width:78%;border-radius:12px;border:1px solid var(--line);box-shadow:0 30px 70px -25px #000}
-.stack img:nth-child(1){left:0;top:0;transform:rotate(-4deg)}.stack img:nth-child(2){right:0;top:12%;transform:rotate(3deg)}.stack img:nth-child(3){left:11%;bottom:0}
-.stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:22px;color:var(--mut);font-size:.92rem}.stats b{display:block;color:#e8f0ea;font-size:1.25rem}
-section{padding:34px 0}h2.sec{font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mut);margin:0 0 6px}
+.stack img:nth-child(1){left:0;top:0;transform:rotate(-4deg)}
+.stack img:nth-child(2){right:0;top:12%;transform:rotate(3deg)}
+.stack img:nth-child(3){left:11%;bottom:0}
+.stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:22px;color:var(--mut);font-size:.92rem}
+.stats b{display:block;color:var(--text);font-size:1.25rem}
+section{padding:34px 0}
+h2.sec{font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mut);margin:0 0 6px}
 h3.big{font-size:clamp(1.5rem,3vw,2.1rem);margin:0 0 18px;letter-spacing:-.01em}
-.card{background:#0d0f17;border-color:var(--line)}
 .deckrow{display:flex;gap:12px;overflow-x:auto;padding:4px 2px 12px;scroll-snap-type:x mandatory}
 .deckrow img{height:200px;border-radius:10px;border:1px solid var(--line);scroll-snap-align:start;cursor:zoom-in}
-.deckhead{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin:22px 0 8px}.deckhead span{color:var(--mut);font-size:.9rem}
+.deckhead{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin:22px 0 8px}
+.deckhead span{color:var(--mut);font-size:.9rem}
 .offers{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;align-items:stretch}
-.offer{position:relative;background:#0d0f17;border:1px solid var(--line);border-radius:18px;padding:26px;display:flex;flex-direction:column}
-.offer.pop{border-color:#5b3f8f;background:linear-gradient(160deg,#160f28,#0b1a14);box-shadow:0 20px 60px -30px #b98cff77}
-.offer .flag{position:absolute;top:-11px;right:18px;font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:var(--acc2);color:#08060f;padding:3px 10px;border-radius:99px}
-.offer h4{margin:0;font-size:1.2rem}.offer .price{font-size:2.3rem;font-weight:900;margin:8px 0 2px}.offer .price small{font-size:.9rem;color:var(--mut);font-weight:600}
-.offer .sub{color:var(--mut);font-size:.92rem;margin:0 0 12px}.offer ul{padding-left:1.1em;margin:0 0 20px;color:#c9d0dc}.offer li{margin:.35em 0}
-.offer .btn{margin:auto 0 0;text-align:center}.offer .alt{margin-top:10px;text-align:center;font-size:.88rem}
+.offer{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:26px;display:flex;flex-direction:column}
+.offer.pop{border-color:var(--border-glow);background:var(--grad-card),var(--surface);box-shadow:0 20px 60px -30px var(--accent-text)77}
+.offer .flag{position:absolute;top:-11px;right:18px;font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:var(--acc2);color:var(--on-accent);padding:3px 10px;border-radius:99px}
+.offer h4{margin:0;font-size:1.2rem}
+.offer .price{font-size:2.3rem;font-weight:900;margin:8px 0 2px}
+.offer .price small{font-size:.9rem;color:var(--mut);font-weight:600}
+.offer .sub{color:var(--mut);font-size:.92rem;margin:0 0 12px}
+.offer ul{padding-left:1.1em;margin:0 0 20px;color:var(--text-2)}
+.offer li{margin:.35em 0}
+.offer .btn{margin:auto 0 0;text-align:center}
+.offer .alt{margin-top:10px;text-align:center;font-size:.88rem}
 .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;counter-reset:s}
-.steps .card{margin:0}.steps .card:before{counter-increment:s;content:counter(s);display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#1a1330;color:var(--acc2);font-weight:800;margin-bottom:8px}
+.steps .card{margin:0}
+.steps .card:before{counter-increment:s;content:counter(s);display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--surface-3);color:var(--acc2);font-weight:800;margin-bottom:8px}
 .steps p{margin:.2em 0 0;color:var(--mut);font-size:.93rem}
 .note{color:var(--mut);font-size:.82rem;margin-top:12px}
-.faq details{background:#0d0f17;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:10px 0}.faq summary{cursor:pointer;font-weight:700}.faq p{color:#b9c1cf;margin:.6em 0 0}
-#lb{position:fixed;inset:0;background:#000d;display:none;place-items:center;z-index:9;cursor:zoom-out}#lb img{max-width:94vw;max-height:90vh;border-radius:10px}
-@media(max-width:820px){.hero{grid-template-columns:1fr}nav .links a{margin:0 14px 0 0}.deckrow img{height:150px}}
-</style><script src="common.js"></script></head><body><main>
-<nav><a class="logo" href="./">anony<span>musk</span></a><div class="links"><a href="#samples">Samples</a><a href="#pricing">Pricing</a><a href="#how">How it works</a><a href="service.html">Launch videos</a><a href="./">Free tools</a></div></nav>
+.faq details{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:10px 0}
+.faq summary{cursor:pointer;font-weight:700}
+.faq p{color:var(--text-2);margin:.6em 0 0}
+#lb{position:fixed;inset:0;background:#000d;display:none;place-items:center;z-index:9;cursor:zoom-out}
+#lb img{max-width:94vw;max-height:90vh;border-radius:10px}
+@media(max-width:820px){.hero{grid-template-columns:1fr}
+.deckrow img{height:150px}}
+</style><script src="common.js"></script></head><body><a class="skip" href="#main">Skip to content</a>
+<header class="site-header"><div class="sh-in"><a class="brand" href="./" aria-label="anonymusk tools home"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="amk-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7d6eff"/><stop offset="1" stop-color="#3fc59f"/></linearGradient></defs><rect width="32" height="32" rx="8" fill="url(#amk-g)"/><path d="M9 22.5 15.2 8.8a1 1 0 0 1 1.8 0L23 22.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.6 17.4c2.9-1.5 5.9-1.5 8.8 0" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg><span class="w">anony<b>musk</b></span></a><nav class="site-nav" aria-label="Main"><a href="./#tools">Tools</a><a href="launch.html">Launch clips</a><a href="decks.html" aria-current="page">Decks</a><a href="service.html" class="cta-link">Service</a></nav></div></header>
+<main id="main">
+<nav class="subnav" aria-label="On this page"><a href="#samples">Samples</a><a href="#pricing">Pricing</a><a href="#how">How it works</a></nav>
 
 <header class="hero">
  <div>
@@ -111,6 +127,15 @@ h3.big{font-size:clamp(1.5rem,3vw,2.1rem);margin:0 0 18px;letter-spacing:-.01em}
 </section>
 <div id="lb"><img alt=""></div>
 </main>
+<footer class="site-footer"><div class="sf-in">
+ <div><a class="brand" href="./"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="amk-g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7d6eff"/><stop offset="1" stop-color="#3fc59f"/></linearGradient></defs><rect width="32" height="32" rx="8" fill="url(#amk-g2)"/><path d="M9 22.5 15.2 8.8a1 1 0 0 1 1.8 0L23 22.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.6 17.4c2.9-1.5 5.9-1.5 8.8 0" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg><span class="w">anony<b>musk</b></span></a><p>Free, in-browser crypto tools. No sign-up, no API keys, no trackers. Built by <a href="https://anonymusk7.github.io/anonymusk/">anonymusk</a>.</p></div>
+ <div><h4>Tools</h4><ul><li><a href="crypto-heatmap.html">Market heatmap</a></li><li><a href="trending.html">Hot token board</a></li><li><a href="holder-map.html">Holder bubble map</a></li><li><a href="wallet-flow.html">Wallet fund-flow</a></li><li><a href="defi-yield-finder.html">DeFi yield finder</a></li><li><a href="./#tools">All tools →</a></li></ul></div>
+ <div><h4>Products</h4><ul><li><a href="report.html">Wallet audit report</a></li><li><a href="launch.html">Launch Clip HD</a></li><li><a href="https://anonymusk.gumroad.com/l/vmpnxc">Pitch deck pack $29</a></li><li><a href="https://anonymusk.gumroad.com/l/sztuha">Motion pack $29</a></li><li><a href="https://anonymusk.gumroad.com/l/ksgvlu">Launch kit $79</a></li></ul></div>
+ <div><h4>Studio</h4><ul><li><a href="service.html">Done-for-you launch videos</a></li><li><a href="decks.html">Pitch deck in 24h</a></li><li><a href="https://anonymusk7.github.io/anonymusk/">Portfolio</a></li><li><a href="https://anonymusk.gumroad.com/">Gumroad store</a></li></ul></div>
+</div>
+<div class="legal"><span><b>Not financial advice.</b> Educational tools only. Data can be delayed, incomplete or wrong. Do your own research.</span><span>Data: CoinGecko · GeckoTerminal · DefiLlama · Blockscout · alternative.me · DexScreener · public RPCs. Each tool credits its sources on the page.</span></div>
+</footer>
+
 <script>
 /* Gumroad product link for the "Crypto Pitch Deck Templates" pack.
    PLACEHOLDER: points at the anonymusk Gumroad storefront until the product exists.

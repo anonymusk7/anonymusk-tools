@@ -1,19 +1,194 @@
-<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width"><title>anonymusk free tools</title><link rel=stylesheet href=style.css><script src=common.js></script><main><h1>Free crypto & creator tools</h1><p class=muted>100% in-browser. No sign-up, no keys. · <a href=service.html><b>Need a pro launch video? Done-for-you →</b></a> · <a href=decks.html><b>Pitch deck in 24h →</b></a></p><div class=grid>
-<a class=card href=service.html style="border-color:#3a7a58;background:linear-gradient(135deg,#0f1f17,#0e1022)"><b>🎬 Done-for-you launch videos</b><br>Teasers, logo reveals and launch films made for you. Starting at $400 · send a brief</a>
-<a class=card href=decks.html style="border-color:#5b3f8f;background:linear-gradient(135deg,#160f28,#0b1a14)"><b>📊 Crypto pitch deck in 24h</b><br>Editable .pptx decks for token launches &amp; DeFi raises. $39 template pack or custom in 24h</a>
-<a class=card href=launch.html><b>🚀 Token → 15s launch clip</b><br>Paste a CoinGecko id or contract, get an animated stats clip (.webm). Free 720p w/ watermark · HD unlock</a>
-<a class=card href=recap.html><b>📼 X year in review</b><br>Drop your bookmarks/tweets export → animated recap video</a>
-<a class=card href=prompts.html><b>🎬 Motion prompt gallery</b><br>20+ motion-design prompts with live previews</a>
-<a class=card href=brain.html><b>🧠 Bookmark brain</b><br>Sort, search, and rediscover forgotten gems</a>
-<a class=card href=roast.html><b>🔥 Roast my wallet</b><br>Public on-chain data → savage animated verdict</a>
-<a class=card href=report.html style="border-color:#2b5a40;background:linear-gradient(135deg,#0c1712,#0e1020)"><b>🧾 Wallet audit report</b><br>Holdings on 7 EVM chains + Solana, open-approval audit, risk grade A–F, printable PDF. Free snapshot · full report unlock</a>
-<a class=card href=leaderboard.html><b>🤖 Agent earnings leaderboard</b><br>Top AI-agent tokens by on-chain volume</a><a class=card href=crypto-heatmap.html><b>🟩 Crypto market heatmap</b><br>Top-100 coins treemap · size = mcap, color = 1h/24h/7d move</a>
-<a class=card href=holder-map.html><b>🫧 Token holder bubble map</b><br>Top holders of any ERC-20 as bubbles, clustered by direct transfers &amp; shared first funders</a>
-<a class=card href=wallet-flow.html><b>🌊 Wallet fund-flow graph</b><br>Animated in/out flows for any EVM wallet, USD-sized, exchange labels, replay timeline</a>
-<a class=card href=trending.html><b>🔥 Hot token board</b><br>Trending DEX pools across chains: price move, volume, txns, buyers, liquidity, age</a>
-<a class=card href=mindshare.html><b>🧠 Crypto mindshare treemap</b><br>Share of X posts across CoinGecko-trending coins, dated snapshot, open method</a>
-<a class=card href=dca-backtester.html><b>📈 DCA backtester</b><br>Would $X/week have beaten a lump sum? 365 days of real prices</a>
-<a class=card href=fear-greed.html><b>😱 Fear & Greed dashboard</b><br>Live sentiment gauge, 90-day history, BTC dominance, copy-tweet</a>
-<a class=card href=impermanent-loss.html><b>⚖️ Impermanent loss calculator</b><br>50/50 LP vs HODL with live prices, fee APR and break-even</a>
-<a class=card href=defi-yield-finder.html><b>🌾 DeFi yield finder</b><br>Filter 15k+ DefiLlama pools by chain, TVL, stable, IL risk</a>
-</div></main>
+<!doctype html><html lang="en"><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>anonymusk tools: free in-browser crypto &amp; creator tools</title>
+<meta name="theme-color" content="#07080c">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><link rel="icon" href="favicon.ico" sizes="32x32"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta property="og:image" content="https://anonymusk7.github.io/anonymusk-tools/assets/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://anonymusk7.github.io/anonymusk-tools/assets/og.png">
+<link rel="preload" href="assets/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/anon.css"><script src="assets/anon.js" defer></script>
+
+<meta name="description" content="Free crypto tools that run in your browser: market heatmap, hot token board, holder bubble map, wallet fund-flow, DeFi yield finder, Fear &amp; Greed, DCA backtester, launch clips and more. No sign-up, no keys.">
+<meta property="og:title" content="anonymusk tools: free in-browser crypto tools"><meta property="og:description" content="Heatmaps, holder maps, wallet flows, yields and launch clips. 100% in-browser. No sign-up, no keys, no trackers."><meta property="og:type" content="website"><meta property="og:url" content="https://anonymusk7.github.io/anonymusk-tools/">
+<script src=common.js></script>
+<style>
+.hero{position:relative;display:grid;grid-template-columns:1.15fr .85fr;gap:44px;align-items:center;padding:40px 0 56px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:5px 12px 5px 6px;border-radius:999px;border:1px solid var(--border-strong);background:var(--surface-glass);font-size:var(--fs-sm);color:var(--text-2);text-decoration:none}
+.eyebrow .badge{padding:2px 8px}
+.eyebrow:hover{color:var(--text);text-decoration:none;border-color:var(--border-glow)}
+.hero h1{font-size:clamp(2.3rem,1.3rem + 3.4vw,3.6rem);line-height:1.02;letter-spacing:-.045em;margin:.38em 0 .32em;font-weight:760}
+.grad{background:var(--grad-brand);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{font-size:clamp(1.02rem,.95rem + .35vw,1.2rem);color:var(--text-2);max-width:52ch;margin:0 0 28px}
+.hero .ctas{display:flex;gap:10px;flex-wrap:wrap}
+.trust{display:flex;gap:28px;flex-wrap:wrap;margin-top:32px;color:var(--text-3);font-size:var(--fs-sm)}
+.trust b{display:block;font-family:var(--mono);font-size:1.35rem;color:var(--text);font-weight:600;letter-spacing:-.02em}
+/* decorative product preview */
+.preview{position:relative;border-radius:var(--r-xl);border:1px solid var(--border-strong);background:linear-gradient(180deg,rgba(20,23,34,.9),rgba(10,12,18,.95));box-shadow:var(--sh-3),0 40px 120px -40px rgba(107,91,255,.45);overflow:hidden}
+.preview::before{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;background:linear-gradient(140deg,rgba(139,124,255,.6),transparent 40%,rgba(94,224,181,.35));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.pv-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid var(--border);font-size:var(--fs-xs);color:var(--text-3)}
+.pv-bar i{width:9px;height:9px;border-radius:50%;background:#2a2f42}
+.pv-bar span{margin-left:8px;font-family:var(--mono)}
+.pv-map{display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:46px;gap:3px;padding:12px}
+.pv-map div{border-radius:6px;display:flex;flex-direction:column;justify-content:center;align-items:center;font-size:11px;font-weight:650;color:rgba(255,255,255,.92);font-family:var(--mono);line-height:1.2}
+.pv-map div small{font-weight:500;opacity:.8;font-size:10px}
+.pv-rows{padding:4px 14px 14px;display:grid;gap:6px}
+.pv-row{display:grid;grid-template-columns:1fr auto auto;gap:14px;align-items:center;padding:8px 10px;border-radius:8px;background:var(--surface-2);border:1px solid var(--border);font-size:12px;font-family:var(--mono)}
+.pv-row b{font-family:var(--font);font-weight:600;font-size:13px}
+/* sections */
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:0 0 20px}
+.sec-head h2{font-size:clamp(1.5rem,1.2rem + 1.2vw,2rem);margin:.15em 0 0;letter-spacing:-.03em}
+.kicker{font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:.14em;color:var(--accent-text);font-weight:650}
+section{padding:28px 0 44px}
+.filters{max-width:100%;overflow-x:auto}
+.tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.tool{display:flex;flex-direction:column;gap:10px;margin:0;padding:18px;min-height:168px}
+.tool .top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ic{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent-text);border:1px solid rgba(139,124,255,.25);flex:none}
+.ic svg{width:20px;height:20px}
+.ic.m{background:rgba(61,220,151,.1);color:var(--up);border-color:rgba(61,220,151,.25)}
+.ic.d{background:rgba(90,169,255,.1);color:var(--info);border-color:rgba(90,169,255,.25)}
+.ic.v{background:rgba(255,181,71,.1);color:var(--warn);border-color:rgba(255,181,71,.25)}
+.tool h3{margin:0;font-size:1rem;font-weight:650;letter-spacing:-.015em;color:var(--text)}
+.tool p{margin:0;color:var(--text-3);font-size:var(--fs-sm);line-height:1.55}
+.tool .meta{margin-top:auto;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.tool .go{margin-left:auto;color:var(--text-4);transition:transform var(--dur) var(--ease),color var(--dur) var(--ease)}
+a.tool:hover .go{color:var(--accent-text);transform:translateX(3px)}
+/* products */
+.products{display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:14px}
+.prod{display:flex;flex-direction:column;gap:8px;margin:0;padding:20px}
+.prod .price{font-family:var(--mono);font-size:1.5rem;font-weight:600;color:var(--text);letter-spacing:-.02em}
+.prod .price small{font-family:var(--font);font-size:var(--fs-sm);color:var(--text-3);font-weight:500}
+.prod p{margin:0;color:var(--text-3);font-size:var(--fs-sm)}
+.prod .btn{margin-top:auto;align-self:flex-start}
+.prod.feat{border-color:rgba(139,124,255,.4);background:var(--grad-card),var(--surface)}
+/* service band */
+.band{display:grid;grid-template-columns:1.2fr 1fr;gap:28px;align-items:center;padding:32px;border-radius:var(--r-xl);border:1px solid rgba(139,124,255,.3);
+  background:radial-gradient(600px 300px at 100% 0,rgba(107,91,255,.22),transparent 70%),radial-gradient(500px 260px at 0 100%,rgba(94,224,181,.10),transparent 70%),var(--surface);box-shadow:var(--sh-3)}
+.band h2{font-size:clamp(1.5rem,1.2rem + 1.2vw,2.1rem);margin:.2em 0 .3em;letter-spacing:-.03em}
+.band ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.band li{display:flex;gap:10px;align-items:flex-start;color:var(--text-2);font-size:var(--fs-md)}
+.band li svg{flex:none;color:var(--up);margin-top:3px}
+.band .ctas{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+@media(max-width:900px){.hero{grid-template-columns:1fr;gap:32px;padding:20px 0 36px}
+.band{grid-template-columns:1fr;padding:22px}}
+@media(max-width:640px){.trust{gap:18px}
+.trust b{font-size:1.15rem}
+.pv-map{grid-auto-rows:38px}
+.pv-row:nth-child(3){display:none}
+.hero .ctas .btn{flex:1}}
+</style>
+</head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="10" height="11" rx="1.5"/><rect x="15" y="3" width="6" height="6" rx="1.5"/><rect x="15" y="11" width="6" height="10" rx="1.5"/><rect x="3" y="16" width="10" height="5" rx="1.5"/></symbol>
+ <symbol id="i-flame" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c4 0 7-2.7 7-7 0-4.5-4-7-4-11-3 2-5 5-5 8-1-1-2-2.3-2-4-2 2-3 4.3-3 7 0 4.3 3 7 7 7Z"/></symbol>
+ <symbol id="i-bubbles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="9" r="5"/><circle cx="17" cy="7" r="3"/><circle cx="16.5" cy="17" r="4"/><path d="M12 11.5 13.5 14"/></symbol>
+ <symbol id="i-flow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="2.5"/><circle cx="19" cy="5" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M7.3 11C11 9 13 6.5 16.5 5.5M7.3 13c3.7 2 5.7 4.5 9.2 5.5"/></symbol>
+ <symbol id="i-pie" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12A9 9 0 1 1 12 3v9Z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15Z"/></symbol>
+ <symbol id="i-gauge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 17a9 9 0 1 1 17 0"/><path d="m12 14 4-5"/><circle cx="12" cy="14" r="1.2"/></symbol>
+ <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 6-7"/></symbol>
+ <symbol id="i-bot" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 4v4M9 13h.01M15 13h.01M9 17h6"/></symbol>
+ <symbol id="i-scale" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M7 21h10M5 7h14M5 7l-3 7a3 3 0 0 0 6 0Zm14 0-3 7a3 3 0 0 0 6 0Z"/></symbol>
+ <symbol id="i-leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-8 5-14 15-15-1 10-7 15-15 15Z"/><path d="M5 19 13 11"/></symbol>
+ <symbol id="i-receipt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2Z"/><path d="M9 8h6M9 12h6M9 16h3"/></symbol>
+ <symbol id="i-skull" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a8 8 0 0 0-5 14.2V20h10v-2.8A8 8 0 0 0 12 3Z"/><circle cx="9" cy="11" r="1.5"/><circle cx="15" cy="11" r="1.5"/><path d="M11 20v-2M13 20v-2"/></symbol>
+ <symbol id="i-rocket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15c-1.5 1.5-2 5-2 5s3.5-.5 5-2"/><path d="M9 12a13 13 0 0 1 10-9c0 4-1 8-9 13Z"/><path d="M9 12H5l2-4h5M12 15v4l4-2v-5"/></symbol>
+ <symbol id="i-film" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></symbol>
+ <symbol id="i-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></symbol>
+ <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4Z"/></symbol>
+ <symbol id="i-deck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M7 13l3-3 2 2 4-4"/></symbol>
+ <symbol id="i-msg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12Z"/></symbol>
+ <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+ <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></symbol>
+</svg>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header"><div class="sh-in"><a class="brand" href="./" aria-label="anonymusk tools home"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="amk-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7d6eff"/><stop offset="1" stop-color="#3fc59f"/></linearGradient></defs><rect width="32" height="32" rx="8" fill="url(#amk-g)"/><path d="M9 22.5 15.2 8.8a1 1 0 0 1 1.8 0L23 22.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.6 17.4c2.9-1.5 5.9-1.5 8.8 0" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg><span class="w">anony<b>musk</b></span></a><nav class="site-nav" aria-label="Main"><a href="./#tools" aria-current="page">Tools</a><a href="launch.html">Launch clips</a><a href="decks.html">Decks</a><a href="service.html" class="cta-link">Service</a></nav></div></header>
+<main id="main">
+<section class="hero">
+ <div>
+  <a class="eyebrow" href="#tools"><span class="badge new">New</span>Holder map, wallet flows, hot tokens &amp; mindshare</a>
+  <h1>Crypto intelligence,<br><span class="grad">without the sign-up.</span></h1>
+  <p class="lead">Free market, wallet and DeFi tools that run 100% in your browser on public data. No accounts, no API keys, no trackers. Plus launch clips and decks when you're ready to ship.</p>
+  <div class="ctas"><a class="btn btn-lg" href="#tools">Explore the tools <svg width="16" height="16"><use href="#i-arrow"/></svg></a><a class="btn btn-lg ghost" href="report.html">Audit a wallet</a></div>
+  <div class="trust"><div><b>18</b>free tools</div><div><b>0</b>API keys</div><div><b>0</b>trackers</div><div><b>8</b>chains covered</div></div>
+ </div>
+ <div class="preview" aria-hidden="true">
+  <div class="pv-bar"><i></i><i></i><i></i><span>crypto-heatmap · 24h</span></div>
+  <div class="pv-map">
+   <div style="grid-column:span 3;grid-row:span 3;background:#178a5c">BTC<small>+2.41%</small></div>
+   <div style="grid-column:span 2;grid-row:span 2;background:#1f6f52">ETH<small>+1.12%</small></div>
+   <div style="grid-row:span 2;background:#8a2a3c">SOL<small>-3.0%</small></div>
+   <div style="background:#2a7a58">BNB<small>+0.8%</small></div>
+   <div style="background:#5c2433">XRP<small>-1.2%</small></div>
+   <div style="grid-column:span 2;background:#14a06a">DOGE<small>+6.9%</small></div>
+   <div style="background:#2d3446">TON<small>0.0%</small></div>
+   <div style="background:#6e2738">ADA<small>-2.1%</small></div>
+   <div style="background:#1d6b4d">AVAX<small>+1.7%</small></div>
+   <div style="background:#1a8058">LINK<small>+3.3%</small></div>
+  </div>
+  <div class="pv-rows">
+   <div class="pv-row"><b>PEPE / WETH</b><span class="up">+18.4%</span><span>$4.2M</span></div>
+   <div class="pv-row"><b>Top-100 holders</b><span>62 clusters</span><span class="up">score 71</span></div>
+   <div class="pv-row"><b>vitalik.eth</b><span>grade A</span><span class="dn">2 approvals</span></div>
+  </div>
+ </div>
+</section>
+
+<section id="tools" aria-labelledby="tools-h">
+ <div class="sec-head">
+  <div><div class="kicker">Free tools</div><h2 id="tools-h">Everything runs in your browser</h2></div>
+  <div class="filters"><div class="seg" role="group" aria-label="Filter tools" data-filter-bar>
+   <button data-f="all" aria-pressed="true">All</button><button data-f="market" aria-pressed="false">Market</button><button data-f="wallet" aria-pressed="false">Wallet</button><button data-f="defi" aria-pressed="false">DeFi</button><button data-f="launch" aria-pressed="false">Launch / Video</button><button data-f="paid" aria-pressed="false">Paid</button>
+  </div></div>
+ </div>
+ <div class="tools">
+  <a class="card tool" data-cat="market" href="crypto-heatmap.html" data-reveal><div class="top"><span class="ic m"><svg><use href="#i-grid"/></svg></span><span class="badge">Market</span></div><h3>Crypto market heatmap</h3><p>Top-100 coins treemap · size = mcap, color = 1h/24h/7d move.</p><div class="meta"><span class="badge">CoinGecko</span><svg class="go" width="16" height="16"><use href="#i-arrow"/></svg></div></a>
+  <a class="card tool" data-cat="wallet" href="holder-map.html" data-reveal><div class="top"><span class="ic"><svg><use href="#i-bubbles"/></svg></span><span class="badge new">New</span></div><h3>Token holder bubble map</h3><p>Top holders of any ERC-20 as bubbles, clustered by direct transfers &amp; shared first funders.</p><div class="meta"><span class="badge">Wallet</span><span class="badge">Blockscout</span><svg class="go" width="16" height="16"><use href="#i-arrow"/></svg></div></a>
+  <a class="card tool" data-cat="wallet" href="wallet-flow.html" data-reveal><div class="top"><span class="ic"><svg><use href="#i-flow"/></svg></span><span class="badge new">New</span></div><h3>Wallet fund-flow graph</h3><p>Animated in/out flows for any EVM wallet, USD-sized, exchange labels, replay timeline.</p><div class="meta"><span class="badge">Wallet</span><span class="badge">Blockscout</span><svg class="go" width="16" height="16"><use href="#i-arrow"/></svg></div></a>
+  <a class="card tool" data-cat="market" href="trending.html" data-reveal><div class="top"><span class="ic m"><svg><use href="#i-flame"/></svg></span><span class="badge new">New</span></div><h3>Hot token board</h3><p>Trending DEX pools across chains: price move, volume, txns, buyers, liquidity, age.</p><div class="meta"><span class="badge">Market</span><span class="badge">GeckoTerminal</span><svg class="go" width="16" height="16"><use href="#i-arrow"/></svg></div></a>
+  <a class="card tool" data-cat="market" href="mindshare.html" data-reveal><div class="top"><span class="ic m"><svg><use href="#i-pie"/></svg></span><span class="badge new">New</span></div><h3>Crypto mindshare treemap</h3><p>Share of X posts across CoinGecko-trending coins, dated snapshot, open method.</p><div class="meta"><span class="badge">Market</span><span class="badge">X · CoinGecko</span><svg class="go" width="16" height="16"><use href="#i-arrow"/></svg></div></a>
+  <a class="card tool" data-cat="wallet paid" href="report.html" data-reveal><div class="top"><span class="ic"><svg><use href="#i-receipt"/></svg></span><span class="badge paid">Free + $15</span></div><h3>Wallet audit report</h3><p>Holdings on 7 EVM chains + Solana, open-approval audit, risk grade A–F, printable PDF. Free snapshot · full report unlock.</p><div class="meta"><span class="badge">Wallet</span><svg class="go" width="16" height="16"><use href="#i-arrow"/></svg></div></a>
+  <a class="card tool" data-cat="market" href="fear-greed.html" data-reveal><div class="top"><span class="ic m"><svg><use href="#i-gauge"/></svg></span><span class="badge">Market</span></div><h3>Fear &amp; Greed dashboard</h3><p>Live sentiment gauge, 90-day history, BTC dominance, copy-tweet.</p><div class="meta"><span class="badge">alternative.me</span><svg class="go" width="16" height="16"><use href="#i-arrow"/></svg></div></a>
+  <a class="card tool" data-cat="market" href="dca-backtester.html" data-reveal><div class="top"><span class="ic m"><svg><use href="#i-chart"/></svg></span><span class="badge">Market</span></div><h3>DCA backtester</h3><p>Would $X/week have beaten a lump sum? 365 days of real prices.</p><div class="meta"><span class="badge">CoinGecko</span><svg class="go" width="16" height="16"><use href="#i-arrow"/></svg></div></a>
+  <a class="card tool" data-cat="defi" href="defi-yield-finder.html" data-reveal><div class="top"><span class="ic d"><svg><use href="#i-leaf"/></svg></span><span class="badge">DeFi</span></div><h3>DeFi yield finder</h3><p>Filter 15k+ DefiLlama pools by chain, TVL, stable, IL risk.</p><div class="meta"><span class="badge">DefiLlama</span><svg class="go" width="16" height="16"><use href="#i-arrow"/></svg></div></a>
+  <a class="card tool" data-cat="defi" href="impermanent-loss.html" data-reveal><div class="top"><span class="ic d"><svg><use href="#i-scale"/></svg></span><span class="badge">DeFi</span></div><h3>Impermanent loss calculator</h3><p>50/50 LP vs HODL with live prices, fee APR and break-even.</p><div class="meta"><span class="badge">CoinGecko</span><svg class="go" width="16" height="16"><use href="#i-arrow"/></svg></div></a>
+  <a class="card tool" data-cat="market" href="leaderboard.html" data-reveal><div class="top"><span class="ic m"><svg><use href="#i-bot"/></svg></span><span class="badge">Market</span></div><h3>Agent earnings leaderboard</h3><p>Top AI-agent tokens by on-chain volume.</p><div class="meta"><span class="badge">On-chain</span><svg class="go" width="16" height="16"><use href="#i-arrow"/></svg></div></a>
+  <a class="card tool" data-cat="wallet" href="roast.html" data-reveal><div class="top"><span class="ic"><svg><use href="#i-skull"/></svg></span><span class="badge">Wallet</span></div><h3>Roast my wallet</h3><p>Public on-chain data → savage animated verdict.</p><div class="meta"><span class="badge">Public RPCs</span><svg class="go" width="16" height="16"><use href="#i-arrow"/></svg></div></a>
+  <a class="card tool" data-cat="launch paid" href="launch.html" data-reveal><div class="top"><span class="ic v"><svg><use href="#i-rocket"/></svg></span><span class="badge paid">Free + HD</span></div><h3>Token → 15s launch clip</h3><p>Paste a CoinGecko id or contract, get an animated stats clip (.webm). Free 720p w/ watermark · HD unlock.</p><div class="meta"><span class="badge">Launch / Video</span><svg class="go" width="16" height="16"><use href="#i-arrow"/></svg></div></a>
+  <a class="card tool" data-cat="launch" href="recap.html" data-reveal><div class="top"><span class="ic v"><svg><use href="#i-film"/></svg></span><span class="badge">Video</span></div><h3>X year in review</h3><p>Drop your bookmarks/tweets export → animated recap video.</p><div class="meta"><span class="badge">Local file</span><svg class="go" width="16" height="16"><use href="#i-arrow"/></svg></div></a>
+  <a class="card tool" data-cat="launch" href="prompts.html" data-reveal><div class="top"><span class="ic v"><svg><use href="#i-spark"/></svg></span><span class="badge">Video</span></div><h3>Motion prompt gallery</h3><p>20+ motion-design prompts with live previews.</p><div class="meta"><span class="badge">Creator</span><svg class="go" width="16" height="16"><use href="#i-arrow"/></svg></div></a>
+  <a class="card tool" data-cat="launch" href="brain.html" data-reveal><div class="top"><span class="ic v"><svg><use href="#i-book"/></svg></span><span class="badge">Creator</span></div><h3>Bookmark brain</h3><p>Sort, search, and rediscover forgotten gems.</p><div class="meta"><span class="badge">Local file</span><svg class="go" width="16" height="16"><use href="#i-arrow"/></svg></div></a>
+  <a class="card tool pro" data-cat="launch paid" href="service.html" data-reveal><div class="top"><span class="ic v"><svg><use href="#i-film"/></svg></span><span class="badge paid">From $400</span></div><h3>Done-for-you launch videos</h3><p>Teasers, logo reveals and launch films made for you. Starting at $400 · send a brief.</p><div class="meta"><span class="badge">Service</span><svg class="go" width="16" height="16"><use href="#i-arrow"/></svg></div></a>
+  <a class="card tool pro" data-cat="launch paid" href="decks.html" data-reveal><div class="top"><span class="ic"><svg><use href="#i-deck"/></svg></span><span class="badge paid">$29 / 24h</span></div><h3>Crypto pitch deck in 24h</h3><p>Editable .pptx decks for token launches &amp; DeFi raises. $29 template pack or custom in 24h.</p><div class="meta"><span class="badge">Service</span><svg class="go" width="16" height="16"><use href="#i-arrow"/></svg></div></a>
+ </div>
+</section>
+
+<section aria-labelledby="prod-h">
+ <div class="sec-head"><div><div class="kicker">Paid products</div><h2 id="prod-h">Go further when it matters</h2></div><a href="https://anonymusk.gumroad.com/" class="muted">All products on Gumroad →</a></div>
+ <div class="products">
+  <div class="card prod feat"><span class="ic"><svg><use href="#i-receipt"/></svg></span><b>Wallet audit report</b><div class="price">$15 <small>one-time</small></div><p>Every holding on 7 chains + Solana, open-approval audit with revoke links, risk grade A–F, printable PDF.</p><a class="btn" href="report.html">Try the free snapshot</a></div>
+  <div class="card prod"><span class="ic v"><svg><use href="#i-rocket"/></svg></span><b>Launch Clip HD</b><div class="price">1080p <small>no watermark</small></div><p>Unlimited 1080×1080 token clips at 10 Mbps, your brand only. License key unlock.</p><a class="btn ghost" href="launch.html">Make a clip</a></div>
+  <div class="card prod"><span class="ic"><svg><use href="#i-deck"/></svg></span><b>Pitch deck template pack</b><div class="price">$29</div><p>Editable .pptx decks for token launches and DeFi raises.</p><a class="btn ghost" href="https://anonymusk.gumroad.com/l/vmpnxc">Get it on Gumroad</a></div>
+  <div class="card prod"><span class="ic v"><svg><use href="#i-film"/></svg></span><b>Crypto Motion Pack</b><div class="price">$29</div><p>Claude/Opus rules + Remotion templates for token-launch, stat-recap and logo-reveal videos.</p><a class="btn ghost" href="https://anonymusk.gumroad.com/l/sztuha">Get it on Gumroad</a></div>
+  <div class="card prod"><span class="ic v"><svg><use href="#i-spark"/></svg></span><b>Crypto Launch Kit (Pro)</b><div class="price">$79</div><p>Live-data chart, partnership and 9:16 Remotion templates plus a no-key data script.</p><a class="btn ghost" href="https://anonymusk.gumroad.com/l/ksgvlu">Get it on Gumroad</a></div>
+ </div>
+</section>
+
+<section aria-labelledby="svc-h">
+ <div class="band">
+  <div><div class="kicker">Done for you</div><h2 id="svc-h">Launching soon? We'll make it look expensive.</h2><p class="muted" style="margin:0">Teasers, logo reveals, launch films and investor decks, built by the same studio behind these tools.</p>
+   <div class="ctas"><a class="btn btn-lg" href="service.html">Send a brief <svg width="16" height="16"><use href="#i-arrow"/></svg></a><a class="btn btn-lg ghost" href="decks.html">Pitch deck in 24h</a></div></div>
+  <ul>
+   <li><svg width="16" height="16"><use href="#i-check"/></svg><span><b>Launch videos from $400</b>: teasers, reveals, explainer films</span></li>
+   <li><svg width="16" height="16"><use href="#i-check"/></svg><span><b>Custom pitch deck in 24h</b>, or the $29 template pack</span></li>
+   <li><svg width="16" height="16"><use href="#i-check"/></svg><span>Crypto-native: token stats, charts and on-chain data built in</span></li>
+  </ul>
+ </div>
+</section>
+</main>
+<footer class="site-footer"><div class="sf-in">
+ <div><a class="brand" href="./"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="amk-g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7d6eff"/><stop offset="1" stop-color="#3fc59f"/></linearGradient></defs><rect width="32" height="32" rx="8" fill="url(#amk-g2)"/><path d="M9 22.5 15.2 8.8a1 1 0 0 1 1.8 0L23 22.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.6 17.4c2.9-1.5 5.9-1.5 8.8 0" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg><span class="w">anony<b>musk</b></span></a><p>Free, in-browser crypto tools. No sign-up, no API keys, no trackers. Built by <a href="https://anonymusk7.github.io/anonymusk/">anonymusk</a>.</p></div>
+ <div><h4>Tools</h4><ul><li><a href="crypto-heatmap.html">Market heatmap</a></li><li><a href="trending.html">Hot token board</a></li><li><a href="holder-map.html">Holder bubble map</a></li><li><a href="wallet-flow.html">Wallet fund-flow</a></li><li><a href="defi-yield-finder.html">DeFi yield finder</a></li><li><a href="./#tools">All tools →</a></li></ul></div>
+ <div><h4>Products</h4><ul><li><a href="report.html">Wallet audit report</a></li><li><a href="launch.html">Launch Clip HD</a></li><li><a href="https://anonymusk.gumroad.com/l/vmpnxc">Pitch deck pack $29</a></li><li><a href="https://anonymusk.gumroad.com/l/sztuha">Motion pack $29</a></li><li><a href="https://anonymusk.gumroad.com/l/ksgvlu">Launch kit $79</a></li></ul></div>
+ <div><h4>Studio</h4><ul><li><a href="service.html">Done-for-you launch videos</a></li><li><a href="decks.html">Pitch deck in 24h</a></li><li><a href="https://anonymusk7.github.io/anonymusk/">Portfolio</a></li><li><a href="https://anonymusk.gumroad.com/">Gumroad store</a></li></ul></div>
+</div>
+<div class="legal"><span><b>Not financial advice.</b> Educational tools only. Data can be delayed, incomplete or wrong. Do your own research.</span><span>Data: CoinGecko · GeckoTerminal · DefiLlama · Blockscout · alternative.me · DexScreener · public RPCs. Each tool credits its sources on the page.</span></div>
+</footer>
+
+</body></html>

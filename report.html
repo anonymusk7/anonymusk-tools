@@ -1,23 +1,59 @@
-<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width"><title>Wallet Audit Report | anonymusk</title><link rel=stylesheet href=style.css><script src=common.js></script>
+<!doctype html><html lang="en"><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Wallet Audit Report | anonymusk</title>
+<meta property="og:title" content="Wallet Audit Report | anonymusk"><meta property="og:type" content="website">
+<meta name="theme-color" content="#07080c">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><link rel="icon" href="favicon.ico" sizes="32x32"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta property="og:image" content="https://anonymusk7.github.io/anonymusk-tools/assets/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://anonymusk7.github.io/anonymusk-tools/assets/og.png">
+<link rel="preload" href="assets/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/anon.css"><script src="assets/anon.js" defer></script>
+<script src=common.js></script>
 <style>
-.sec{background:#0e1411;border:1px solid #1d2a22;border-radius:14px;padding:18px 20px;margin:16px 0}.sec h2{margin:.1em 0 .5em;font-size:1.25rem}.sec h2 small{font-weight:400;color:#7a8a80;font-size:.8rem}
-table{width:100%;border-collapse:collapse;font-size:.92rem}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid #1d2a22;vertical-align:top}th{color:#7a8a80;font-weight:600}td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}.kpi{background:#0a0f0c;border:1px solid #1d2a22;border-radius:12px;padding:10px 14px}.kpi b{display:block;font-size:1.5rem}.kpi span{color:#7a8a80;font-size:.85rem}
-.bar{display:flex;height:16px;border-radius:8px;overflow:hidden;margin:10px 0 4px;background:#1d2a22}.bar i{display:block;height:100%}.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:.85rem;color:#9ab}.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
-.tag{display:inline-block;font-size:.72rem;padding:1px 7px;border-radius:99px;margin-left:4px;border:1px solid #2a3a30;color:#9ab}.tag.r{border-color:#7a2a3a;color:#ff8a9d}.tag.y{border-color:#7a6a2a;color:#ffd27a}.tag.g{border-color:#2b5a40;color:#5dffb0}
-.note{padding:10px 14px;border-left:4px solid #5dffb0;background:#0a0f0c;border-radius:8px;margin:8px 0}.note.hi{border-color:#ff5d7a}.note.md{border-color:#ffb85d}.note.lo{border-color:#5d9bff}.note b{display:block}
-.grade{font-size:3.4rem;font-weight:900;line-height:1}.pill{display:inline-block;padding:3px 10px;border-radius:99px;background:#1d2a22;font-size:.8rem;font-weight:700}.pill.hd{background:#5dffb0;color:#04130b}
-.locked{position:relative;overflow:hidden}.locked .blur{filter:blur(5px);opacity:.5;user-select:none;pointer-events:none}.locked .sk{height:12px;background:#22302a;border-radius:6px;margin:9px 0}
-.pro{border-color:#2b5a40;background:linear-gradient(135deg,#0c1712,#0e1020)}.btn{display:inline-block;background:linear-gradient(90deg,#5dffb0,#7a8cff);color:#04130b;font-weight:900;padding:12px 18px;border-radius:12px;text-decoration:none}
-.cta{background:linear-gradient(135deg,#10251a,#141434);border-color:#3a7a58}.prhead{display:none}.mono{font-family:ui-monospace,Menlo,monospace;font-size:.85em;word-break:break-all}
-@media print{body{background:#fff!important;color:#111!important;font-size:11pt}a{color:#0a5!important}.noprint,footer{display:none!important}.prhead{display:block}main{max-width:none;padding:0}
- .sec,.kpi,.note{background:#fff!important;border-color:#ccc!important;break-inside:avoid}th,td{border-color:#ddd!important}th,.muted,.kpi span{color:#555!important}.tag{color:#333!important;border-color:#999!important}.locked .blur{display:none}.legend{color:#333}.cta{background:#f3fff8!important}h2{break-after:avoid}}
+.sec{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin:16px 0}
+.sec h2{margin:.1em 0 .5em;font-size:1.25rem}
+.sec h2 small{font-weight:400;color:var(--text-3);font-size:.8rem}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:top}
+th{}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.kpi{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:10px 14px}
+.kpi b{display:block;font-size:1.5rem}
+.kpi span{color:var(--text-3);font-size:.85rem}
+.bar{display:flex;height:16px;border-radius:8px;overflow:hidden;margin:10px 0 4px;background:var(--border)}
+.bar i{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:.85rem;color:var(--text-3)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+.tag{display:inline-block;font-size:.72rem;padding:1px 7px;border-radius:99px;margin-left:4px;border:1px solid var(--border-strong);color:var(--text-3)}
+.tag.r{border-color:#7a2a3a;color:#ff8a9c}
+.tag.y{border-color:#7a6a2a;color:#ffd27a}
+.tag.g{border-color:var(--border-glow);color:var(--up)}
+.note{padding:10px 14px;border-left:4px solid var(--accent-text);background:var(--surface-2);border-radius:8px;margin:8px 0}
+.note.hi{border-color:var(--down)}
+.note.md{border-color:var(--warn)}
+.note.lo{border-color:#5d9bff}
+.note b{display:block}
+.grade{font-size:3.4rem;font-weight:900;line-height:1}
+.locked{position:relative;overflow:hidden}
+.locked .blur{filter:blur(5px);opacity:.5;user-select:none;pointer-events:none}
+.locked .sk{height:12px;background:var(--surface-3);border-radius:6px;margin:9px 0}
+.prhead{display:none}
+.mono{font-family:var(--mono);font-size:.85em;word-break:break-all}
+@media print{.noprint,footer{display:none!important}
+.prhead{display:block}
+.sec,.kpi,.note{background:#fff!important;border-color:#ccc!important;break-inside:avoid}
+th,td{border-color:#ddd!important}
+th,.muted,.kpi span{color:#555!important}
+.tag{color:#333!important;border-color:#999!important}
+.locked .blur{display:none}
+.legend{color:#333}
+h2{break-after:avoid}}
 </style>
-<main>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header"><div class="sh-in"><a class="brand" href="./" aria-label="anonymusk tools home"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="amk-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7d6eff"/><stop offset="1" stop-color="#3fc59f"/></linearGradient></defs><rect width="32" height="32" rx="8" fill="url(#amk-g)"/><path d="M9 22.5 15.2 8.8a1 1 0 0 1 1.8 0L23 22.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.6 17.4c2.9-1.5 5.9-1.5 8.8 0" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg><span class="w">anony<b>musk</b></span></a><nav class="site-nav" aria-label="Main"><a href="./#tools" aria-current="page">Tools</a><a href="launch.html">Launch clips</a><a href="decks.html">Decks</a><a href="service.html" class="cta-link">Service</a></nav></div></header>
+<main id="main">
 <div class=prhead><b>anonymusk · Wallet Audit Report</b> · anonymusk7.github.io/anonymusk-tools/report.html</div>
-<h1>🧾 Wallet Audit Report</h1>
+<div class="crumbs"><a href="./#tools">Tools</a><span aria-hidden="true">/</span><span>Wallet · Paid</span></div><h1>Wallet Audit Report</h1>
 <p class="muted noprint">Paste a public EVM (0x…) or Solana address. The report is built <b>in your browser</b> from free public data: public RPCs, Blockscout, and DefiLlama prices. No keys, no sign-in, no wallet connect. <a href="roast.html">Just want a roast? →</a></p>
-<div class="row noprint"><input id=a size=46 value="0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"><button id=go>Build report</button><button id=pr disabled>🖨 Print / Save PDF</button><span id=tier class=pill></span></div>
+<div class="row noprint"><input id=a size=46 value="0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"><button id=go>Build report</button><button id=pr class=ghost disabled>🖨 Print / Save PDF</button><span id=tier class=pill></span></div>
 <div id=st class="muted noprint"></div>
 <div id=out></div>
 <div class="sec pro noprint" id=gate hidden>
@@ -27,18 +63,27 @@ table{width:100%;border-collapse:collapse;font-size:.92rem}th,td{text-align:left
  <div class=row style="margin-top:12px"><input id=lic placeholder="Paste license key (XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX)" size=44><button id=act>Unlock</button></div><div id=lst class=muted></div>
 </div>
 <div id=cta></div>
-<div class="sec pro noprint" id=proOn hidden><b style="color:#5dffb0">✓ Full report unlocked</b> on this browser. <a href=# id=deact>Remove key</a></div>
+<div class="sec pro noprint" id=proOn hidden><b style="color:var(--accent-text)">✓ Full report unlocked</b> on this browser. <a href=# id=deact>Remove key</a></div>
 </main>
+<footer class="site-footer"><div class="sf-in">
+ <div><a class="brand" href="./"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="amk-g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7d6eff"/><stop offset="1" stop-color="#3fc59f"/></linearGradient></defs><rect width="32" height="32" rx="8" fill="url(#amk-g2)"/><path d="M9 22.5 15.2 8.8a1 1 0 0 1 1.8 0L23 22.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.6 17.4c2.9-1.5 5.9-1.5 8.8 0" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg><span class="w">anony<b>musk</b></span></a><p>Free, in-browser crypto tools. No sign-up, no API keys, no trackers. Built by <a href="https://anonymusk7.github.io/anonymusk/">anonymusk</a>.</p></div>
+ <div><h4>Tools</h4><ul><li><a href="crypto-heatmap.html">Market heatmap</a></li><li><a href="trending.html">Hot token board</a></li><li><a href="holder-map.html">Holder bubble map</a></li><li><a href="wallet-flow.html">Wallet fund-flow</a></li><li><a href="defi-yield-finder.html">DeFi yield finder</a></li><li><a href="./#tools">All tools →</a></li></ul></div>
+ <div><h4>Products</h4><ul><li><a href="report.html">Wallet audit report</a></li><li><a href="launch.html">Launch Clip HD</a></li><li><a href="https://anonymusk.gumroad.com/l/vmpnxc">Pitch deck pack $29</a></li><li><a href="https://anonymusk.gumroad.com/l/sztuha">Motion pack $29</a></li><li><a href="https://anonymusk.gumroad.com/l/ksgvlu">Launch kit $79</a></li></ul></div>
+ <div><h4>Studio</h4><ul><li><a href="service.html">Done-for-you launch videos</a></li><li><a href="decks.html">Pitch deck in 24h</a></li><li><a href="https://anonymusk7.github.io/anonymusk/">Portfolio</a></li><li><a href="https://anonymusk.gumroad.com/">Gumroad store</a></li></ul></div>
+</div>
+<div class="legal"><span><b>Not financial advice.</b> Educational tools only. Data can be delayed, incomplete or wrong. Do your own research.</span><span>Data: CoinGecko · GeckoTerminal · DefiLlama · Blockscout · alternative.me · DexScreener · public RPCs. Each tool credits its sources on the page.</span></div>
+</footer>
+
 <script>
 /* ===== config ===== */
 // >>> Paste your real Gumroad product URL here (see plays/08-report/README.md) <<<
 const GUMROAD_REPORT_URL='https://anonymusk.gumroad.com/l/ubplh';
 const GUMROAD_STORE='https://anonymusk.gumroad.com/',PRICE_LABEL='$15 one-time',LK='amk_report_license';
 const RPC=c=>`https://${c}-rpc.publicnode.com`,BS='https://eth.blockscout.com',LL='https://coins.llama.fi/prices/current/';
-const CH={ethereum:{n:'Ethereum',rpc:'ethereum',ll:'ethereum',nat:'ETH',cg:'ethereum',col:'#7a8cff',ex:'https://etherscan.io/address/',tok:{'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48':'USDC','0xdAC17F958D2ee523a2206206994597C13D831ec7':'USDT','0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2':'WETH','0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599':'WBTC','0x6B175474E89094C44Da98b954EedeAC495271d0F':'DAI','0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84':'stETH','0x514910771AF9Ca656af840dff83E8264EcF986CA':'LINK','0x6982508145454Ce325dDbE47a25d4ec3d2311933':'PEPE'}},
+const CH={ethereum:{n:'Ethereum',rpc:'ethereum',ll:'ethereum',nat:'ETH',cg:'ethereum',col:'#8b7cff',ex:'https://etherscan.io/address/',tok:{'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48':'USDC','0xdAC17F958D2ee523a2206206994597C13D831ec7':'USDT','0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2':'WETH','0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599':'WBTC','0x6B175474E89094C44Da98b954EedeAC495271d0F':'DAI','0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84':'stETH','0x514910771AF9Ca656af840dff83E8264EcF986CA':'LINK','0x6982508145454Ce325dDbE47a25d4ec3d2311933':'PEPE'}},
  base:{n:'Base',rpc:'base',ll:'base',nat:'ETH',cg:'ethereum',col:'#3b82f6',ex:'https://basescan.org/address/',tok:{'0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913':'USDC','0x4200000000000000000000000000000000000006':'WETH','0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf':'cbBTC','0x940181a94A35A4569E4529A3CDfB74e38FD98631':'AERO','0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed':'DEGEN','0x532f27101965dd16442E59d40670FaF5eBB142E4':'BRETT','0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA':'USDbC','0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b':'VIRTUAL'}},
  arbitrum:{n:'Arbitrum',rpc:'arbitrum-one',ll:'arbitrum',nat:'ETH',cg:'ethereum',col:'#5dc8ff',ex:'https://arbiscan.io/address/',tok:{'0xaf88d065e77c8cC2239327C5EDb3A432268e5831':'USDC','0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9':'USDT0','0x82aF49447D8a07e3bd95BD0d56f35241523fBab1':'WETH','0x912CE59144191C1204E64559FE8253a0e49E6548':'ARB','0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f':'WBTC','0xfc5A1A6EB076a2C7aD06eD22C90d7E710E35ad0a':'GMX'}},
- optimism:{n:'Optimism',rpc:'optimism',ll:'optimism',nat:'ETH',cg:'ethereum',col:'#ff5d7a',ex:'https://optimistic.etherscan.io/address/',tok:{'0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85':'USDC','0x94b008aA00579c1307B0EF2c499aD98a8ce58e58':'USDT','0x4200000000000000000000000000000000000006':'WETH','0x4200000000000000000000000000000000000042':'OP'}},
+ optimism:{n:'Optimism',rpc:'optimism',ll:'optimism',nat:'ETH',cg:'ethereum',col:'#ff5c74',ex:'https://optimistic.etherscan.io/address/',tok:{'0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85':'USDC','0x94b008aA00579c1307B0EF2c499aD98a8ce58e58':'USDT','0x4200000000000000000000000000000000000006':'WETH','0x4200000000000000000000000000000000000042':'OP'}},
  polygon:{n:'Polygon',rpc:'polygon-bor',ll:'polygon',nat:'POL',cg:'polygon-ecosystem-token',col:'#a77aff',ex:'https://polygonscan.com/address/',tok:{'0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359':'USDC','0xc2132D05D31c914a87C6611C10748AEb04B58e8F':'USDT0','0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619':'WETH','0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6':'WBTC'}},
  bsc:{n:'BNB Chain',rpc:'bsc',ll:'bsc',nat:'BNB',cg:'binancecoin',col:'#ffd25d',ex:'https://bscscan.com/address/',tok:{'0x55d398326f99059fF775485246999027B3197955':'USDT','0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d':'USDC','0x2170Ed0880ac9A755fd29B2688956BD959F933F8':'ETH','0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c':'BTCB','0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82':'CAKE'}},
  avax:{n:'Avalanche',rpc:'avalanche-c-chain',ll:'avax',nat:'AVAX',cg:'avalanche-2',col:'#ff8a5d',ex:'https://snowtrace.io/address/',tok:{'0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E':'USDC','0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7':'USDt','0x49D5c2BdFfac6CE2BFdB6640F4F80f226bc10bAB':'WETH.e'}}};
@@ -154,7 +199,7 @@ function render(R,pro){const k=R.k,A=R.ap,when=new Date();let o='';const chainNa
    if(A.spamIgn)o+=`<p class=muted>${A.spamIgn} fake approvals emitted by spam tokens were filtered out.</p>`;
    if(A.nft.length)o+=`<h3>NFT operator approvals (setApprovalForAll)</h3><table><tr><th>Collection</th><th>Operator</th></tr>${A.nft.map(x=>`<tr><td>${esc(x.tl.name||sh(x.token))}</td><td class=mono>${esc(x.sl.name||sh(x.spender))}</td></tr>`).join('')}</table>`;
    o+=`<p class=muted>Approvals on L2s and BNB Chain are not scanned (no free CORS log index). Check them at <a href="https://revoke.cash/address/${R.ad}">revoke.cash</a>.</p>`}
-  o+=`</div><div class=sec><h2>4 · Risk score & notes</h2><div class=row style="gap:22px"><div class=grade style="color:${{A:'#5dffb0',B:'#a6ff5d',C:'#ffd25d',D:'#ff8a5d',F:'#ff3d5d'}[R.grade]}">${R.grade}${R.prov?'*':''}</div><div><b>${R.score}/100${R.prov?' · provisional':''}</b><br><span class=muted>Heuristic hygiene score. It starts at 100 and loses points for open unlimited approvals, risky spenders, delegates, concentration, illiquid bags and hot-wallet exposure.</span></div></div>
+  o+=`</div><div class=sec><h2>4 · Risk score & notes</h2><div class=row style="gap:22px"><div class=grade style="color:${{A:'#3ddc97',B:'#a6ff5d',C:'#ffd25d',D:'#ff8a5d',F:'#ff3d5d'}[R.grade]}">${R.grade}${R.prov?'*':''}</div><div><b>${R.score}/100${R.prov?' · provisional':''}</b><br><span class=muted>Heuristic hygiene score. It starts at 100 and loses points for open unlimited approvals, risky spenders, delegates, concentration, illiquid bags and hot-wallet exposure.</span></div></div>
    ${R.notes.map(n=>`<div class="note ${n.lv}"><b>${n.lv==='hi'?'🔴':n.lv==='md'?'🟠':n.lv==='lo'?'🔵':'🟢'} ${esc(n.t)}</b>${esc(n.d)}</div>`).join('')}</div>`;
   const d=t=>t?new Date(t).toLocaleDateString():'—';
   o+=`<div class=sec><h2>5 · Activity & hygiene</h2><table>${R.kind==='evm'?`<tr><th>Chain</th><th class=n>Txs sent (nonce)</th><th>Account type</th></tr>${Object.entries(R.chains).map(([c,x])=>`<tr><td>${CH[c].n}</td><td class=n>${x.err?'<span class=muted>rpc error</span>':x.nonce==null?'—':x.nonce.toLocaleString()}</td><td>${x.code&&x.code.startsWith('0xef0100')?'EOA + 7702 delegate':x.code&&x.code!=='0x'?'contract':'EOA'}</td></tr>`).join('')}</table>

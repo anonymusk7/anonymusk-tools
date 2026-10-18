@@ -4,51 +4,44 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>DeFi Yield Finder: top APY pools by chain, TVL &amp; risk | anonymusk</title>
+<meta name="theme-color" content="#07080c">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><link rel="icon" href="favicon.ico" sizes="32x32"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta property="og:image" content="https://anonymusk7.github.io/anonymusk-tools/assets/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://anonymusk7.github.io/anonymusk-tools/assets/og.png">
+<link rel="preload" href="assets/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/anon.css"><script src="assets/anon.js" defer></script>
+
 <meta name="description" content="Free DeFi yield finder. Filter thousands of DefiLlama pools by chain, TVL, stablecoins and impermanent-loss risk, then sort by APY or TVL. Runs entirely in your browser.">
 <meta property="og:title" content="DeFi Yield Finder | anonymusk">
 <meta property="og:description" content="Filter DefiLlama yield pools by chain, TVL, stablecoin and IL risk. Free, client-side.">
 <style>
-body{margin:0;background:#07090c;color:#e8f0ea;font:16px/1.5 Inter,system-ui,sans-serif}
-main{max-width:1100px;margin:auto;padding:24px}
-h1{font-size:2rem;margin:.2em 0}
+main{max-width:1100px}
 h2{font-size:1.25rem;margin:.1em 0 .4em}
-a{color:#5dffb0}
-input,select,button{font:inherit;padding:10px 14px;border-radius:10px;border:1px solid #2a3a30;background:#101612;color:#e8f0ea}
-button{background:#5dffb0;color:#04130b;font-weight:800;cursor:pointer;border:0}
-button:disabled{opacity:.5;cursor:default}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.card{background:#0e1411;border:1px solid #1d2a22;border-radius:14px;padding:16px;margin:10px 0}
-.muted{color:#7a8a80}
-.acc{color:#5dffb0}.pur{color:#a98bff}
-.num,code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.pur{color:var(--accent-text)}
 .filters{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;align-items:end}
-.filters label{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:#9fb}
-.filters label.chk{flex-direction:row;align-items:center;gap:8px;font-size:.95rem;color:#e8f0ea;padding:10px 0}
-.filters input[type=checkbox]{width:18px;height:18px;accent-color:#5dffb0;padding:0}
-.warn{border-color:#5a3a2b;background:linear-gradient(135deg,#1a110c,#120e1c)}
-.warn b{color:#ffb35d}
-.tw{overflow-x:auto;border:1px solid #1d2a22;border-radius:14px;margin-top:10px}
+.filters label{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--text-3)}
+.filters label.chk{flex-direction:row;align-items:center;gap:8px;font-size:.95rem;color:var(--text);padding:10px 0}
+.filters input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent-text);padding:0}
+.warn{border-color:var(--border-strong);background:var(--grad-card),var(--surface)}
+.warn b{color:var(--warn)}
 table{width:100%;border-collapse:collapse;font-size:.92rem}
-th,td{padding:9px 12px;text-align:left;white-space:nowrap;border-bottom:1px solid #16201b}
-th{background:#0b100d;color:#9fb;font-weight:600;position:sticky;top:0}
+th,td{padding:9px 12px;text-align:left;white-space:nowrap;border-bottom:1px solid var(--border)}
+th{position:sticky;top:0}
 td.num,th.num{text-align:right}
-tbody tr:hover{background:#0f1813}
-.hi{color:#ffb35d}.xhi{color:#ff5d7a;font-weight:700}
-.pill{font-size:.75rem;padding:2px 8px;border-radius:99px;border:1px solid #2a3a30;color:#9fb;margin-left:6px}
-.pill.st{border-color:#7a8cff;color:#a9b4ff}
-.pill.il{border-color:#5dffb0;color:#5dffb0}
-.bar{height:4px;background:#101612;border-radius:4px;overflow:hidden;margin-top:8px}
-.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#5dffb0,#7a8cff);transition:width .2s}
-.cap{border-color:#2b5a40;background:linear-gradient(135deg,#0c1712,#0e1020)}
+.hi{color:var(--warn)}
+.xhi{color:var(--down);font-weight:700}
+.pill.st{border-color:var(--accent-text);color:var(--accent-text)}
+.pill.il{border-color:var(--up);color:var(--up)}
+.bar{height:4px;background:var(--surface-3);border-radius:4px;overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
 .cap input[type=email]{flex:1;min-width:220px}
-.btn{display:inline-block;background:linear-gradient(90deg,#5dffb0,#7a8cff);color:#04130b;font-weight:800;padding:10px 18px;border-radius:10px;text-decoration:none}
-footer{text-align:center;padding:30px;color:#7a8a80;font-size:.9rem}
-@media(max-width:600px){main{padding:14px}h1{font-size:1.5rem}th,td{padding:7px 8px}}
+@media(max-width:600px){th,td{padding:7px 8px}}
 </style>
 </head>
 <body>
-<main>
-<h1>🌾 DeFi Yield Finder</h1>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header"><div class="sh-in"><a class="brand" href="./" aria-label="anonymusk tools home"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="amk-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7d6eff"/><stop offset="1" stop-color="#3fc59f"/></linearGradient></defs><rect width="32" height="32" rx="8" fill="url(#amk-g)"/><path d="M9 22.5 15.2 8.8a1 1 0 0 1 1.8 0L23 22.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.6 17.4c2.9-1.5 5.9-1.5 8.8 0" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg><span class="w">anony<b>musk</b></span></a><nav class="site-nav" aria-label="Main"><a href="./#tools" aria-current="page">Tools</a><a href="launch.html">Launch clips</a><a href="decks.html">Decks</a><a href="service.html" class="cta-link">Service</a></nav></div></header>
+<main id="main">
+<div class="crumbs"><a href="./#tools">Tools</a><span aria-hidden="true">/</span><span>DeFi</span></div><h1>DeFi Yield Finder</h1>
 <p class="muted">Search thousands of yield pools across every chain DefiLlama tracks. Filter by chain, TVL, stablecoins and impermanent-loss risk, then sort by APY or TVL. Everything runs in your browser.</p>
 
 <div class="card">
@@ -73,7 +66,7 @@ footer{text-align:center;padding:30px;color:#7a8a80;font-size:.9rem}
 <div class="tw">
 <table>
  <thead><tr><th>#</th><th>Project</th><th>Chain</th><th>Symbol</th><th class="num">TVL</th><th class="num">APY base</th><th class="num">APY reward</th><th class="num">APY total</th><th class="num">30d mean</th><th>Pool</th></tr></thead>
- <tbody id="tb"><tr><td colspan="10" class="muted">Loading pools…</td></tr></tbody>
+ <tbody id="tb"><tr class="sk-row"><td colspan=10 style="padding:0"><span class="sr-only">Loading…</span><div class="sk-rows" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></td></tr></tbody>
 </table>
 </div>
 
@@ -92,11 +85,16 @@ footer{text-align:center;padding:30px;color:#7a8a80;font-size:.9rem}
  </form>
 </div>
 </main>
-
-<footer>
- <div style="margin-bottom:6px"><b class="acc">anonymusk tools</b></div>
- <a href="./">← all free tools</a> · made by <a href="https://anonymusk7.github.io/anonymusk/">anonymusk</a> · want studio-grade launch videos? <a href="https://anonymusk.gumroad.com/l/sztuha">Motion pack $29</a> / <a href="https://anonymusk.gumroad.com/l/ksgvlu">Launch kit $79</a>
+<footer class="site-footer"><div class="sf-in">
+ <div><a class="brand" href="./"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="amk-g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7d6eff"/><stop offset="1" stop-color="#3fc59f"/></linearGradient></defs><rect width="32" height="32" rx="8" fill="url(#amk-g2)"/><path d="M9 22.5 15.2 8.8a1 1 0 0 1 1.8 0L23 22.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.6 17.4c2.9-1.5 5.9-1.5 8.8 0" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg><span class="w">anony<b>musk</b></span></a><p>Free, in-browser crypto tools. No sign-up, no API keys, no trackers. Built by <a href="https://anonymusk7.github.io/anonymusk/">anonymusk</a>.</p></div>
+ <div><h4>Tools</h4><ul><li><a href="crypto-heatmap.html">Market heatmap</a></li><li><a href="trending.html">Hot token board</a></li><li><a href="holder-map.html">Holder bubble map</a></li><li><a href="wallet-flow.html">Wallet fund-flow</a></li><li><a href="defi-yield-finder.html">DeFi yield finder</a></li><li><a href="./#tools">All tools →</a></li></ul></div>
+ <div><h4>Products</h4><ul><li><a href="report.html">Wallet audit report</a></li><li><a href="launch.html">Launch Clip HD</a></li><li><a href="https://anonymusk.gumroad.com/l/vmpnxc">Pitch deck pack $29</a></li><li><a href="https://anonymusk.gumroad.com/l/sztuha">Motion pack $29</a></li><li><a href="https://anonymusk.gumroad.com/l/ksgvlu">Launch kit $79</a></li></ul></div>
+ <div><h4>Studio</h4><ul><li><a href="service.html">Done-for-you launch videos</a></li><li><a href="decks.html">Pitch deck in 24h</a></li><li><a href="https://anonymusk7.github.io/anonymusk/">Portfolio</a></li><li><a href="https://anonymusk.gumroad.com/">Gumroad store</a></li></ul></div>
+</div>
+<div class="legal"><span><b>Not financial advice.</b> Educational tools only. Data can be delayed, incomplete or wrong. Do your own research.</span><span>Data: CoinGecko · GeckoTerminal · DefiLlama · Blockscout · alternative.me · DexScreener · public RPCs. Each tool credits its sources on the page.</span></div>
 </footer>
+
+
 
 <script>
 (function(){

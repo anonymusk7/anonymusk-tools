@@ -4,53 +4,49 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>🌊 Impermanent loss calculator (50/50 AMM) | anonymusk</title>
+<meta name="theme-color" content="#07080c">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><link rel="icon" href="favicon.ico" sizes="32x32"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta property="og:image" content="https://anonymusk7.github.io/anonymusk-tools/assets/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://anonymusk7.github.io/anonymusk-tools/assets/og.png">
+<link rel="preload" href="assets/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/anon.css"><script src="assets/anon.js" defer></script>
+
 <meta name="description" content="Free impermanent loss calculator for 50/50 AMM liquidity positions. Live CoinGecko prices, HODL vs LP value, fee income, net result, break-even APR and an IL curve chart. Runs in your browser.">
 <meta property="og:title" content="Impermanent loss calculator (50/50 AMM) | anonymusk">
 <meta property="og:description" content="HODL vs LP, IL % and USD, fees, break-even APR. Live prices, client-side only.">
 <style>
-body{margin:0;background:#07090c;color:#e8f0ea;font:16px/1.5 Inter,system-ui,sans-serif}
-main{max-width:1000px;margin:auto;padding:24px}
-h1{font-size:2rem;margin:.2em 0}
-h2{font-size:1.05rem;margin:0 0 10px;color:#cfe}
-a{color:#5dffb0}
-input,select,button{font:inherit;padding:10px 14px;border-radius:10px;border:1px solid #2a3a30;background:#101612;color:#e8f0ea}
+h2{font-size:1.05rem;margin:0 0 10px;color:var(--text-2)}
 input{min-width:0;box-sizing:border-box}
-button{background:#5dffb0;color:#04130b;font-weight:800;cursor:pointer;border:0}
-button:disabled{opacity:.5;cursor:default}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.card{background:#0e1411;border:1px solid #1d2a22;border-radius:14px;padding:16px;margin:10px 0}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.muted{color:#7a8a80}
-.mono,.num,input[type=number]{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums}
-label{display:block;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:#8a9;margin-bottom:4px}
+.mono,.num,input[type=number]{font-family:var(--mono);font-variant-numeric:tabular-nums}
+label{display:block;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:4px}
 .fld input{width:100%}
-.tok{border-left:3px solid #5dffb0}
-.tok.b{border-left-color:#a78bfa}
-.tok h2 .sym{color:#5dffb0}.tok.b h2 .sym{color:#a78bfa}
-input[type=range]{width:100%;padding:0;accent-color:#5dffb0;background:transparent;border:0}
-.tok.b input[type=range]{accent-color:#a78bfa}
+.tok{border-left:3px solid var(--accent-text)}
+.tok.b{border-left-color:var(--accent-text)}
+.tok h2 .sym{color:var(--accent-text)}
+.tok.b h2 .sym{color:var(--accent-text)}
+input[type=range]{width:100%;padding:0;accent-color:var(--accent-text);background:transparent;border:0}
+.tok.b input[type=range]{accent-color:var(--accent-text)}
 .pct{font-weight:700}
-.stat .lbl{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:#8a9}
-.stat .big{font-size:1.7rem;font-weight:800;line-height:1.15;margin:4px 0 2px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums;word-break:break-all}
-.stat .sub{font-size:.85rem;color:#7a8a80}
-.pos{color:#5dffb0}.neg{color:#ff5d7a}
-.stat.hl{border-color:#2b5a40;background:linear-gradient(135deg,#0c1712,#0e1020)}
-canvas{width:100%;height:auto;max-width:100%;border-radius:14px;display:block;margin:6px 0;background:#000}
+.stat .lbl{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3)}
+.stat .big{font-size:1.7rem;font-weight:800;line-height:1.15;margin:4px 0 2px;font-family:var(--mono);font-variant-numeric:tabular-nums;word-break:break-all}
+.stat .sub{font-size:.85rem;color:var(--text-3)}
+.stat.hl{border-color:var(--border-glow);background:var(--grad-card),var(--surface)}
+canvas{width:100%;height:auto;max-width:100%;border-radius:14px;display:block;margin:6px 0;background:var(--bg-inset)}
 #st{min-height:1.5em}
-#st.err{color:#ff5d7a}
-.spin{display:inline-block;width:12px;height:12px;border:2px solid #5dffb0;border-right-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-1px;margin-right:6px}
+#st.err{color:var(--down)}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid var(--accent-text);border-right-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-1px;margin-right:6px}
 @keyframes sp{to{transform:rotate(360deg)}}
-.cap{border-color:#2b5a40;background:linear-gradient(135deg,#0c1712,#0e1020)}
 .cap input[type=email]{flex:1;min-width:200px}
-.note{font-size:.85rem;color:#7a8a80;border-left:3px solid #a78bfa;padding-left:10px}
-footer{text-align:center;padding:30px;color:#7a8a80;font-size:.9rem}
-@media(max-width:640px){.two{grid-template-columns:1fr}h1{font-size:1.6rem}main{padding:16px}}
+.note{font-size:.85rem;color:var(--text-3);border-left:3px solid var(--accent-text);padding-left:10px}
+@media(max-width:640px){.two{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<main>
-<h1>🌊 Impermanent loss calculator</h1>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header"><div class="sh-in"><a class="brand" href="./" aria-label="anonymusk tools home"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="amk-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7d6eff"/><stop offset="1" stop-color="#3fc59f"/></linearGradient></defs><rect width="32" height="32" rx="8" fill="url(#amk-g)"/><path d="M9 22.5 15.2 8.8a1 1 0 0 1 1.8 0L23 22.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.6 17.4c2.9-1.5 5.9-1.5 8.8 0" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg><span class="w">anony<b>musk</b></span></a><nav class="site-nav" aria-label="Main"><a href="./#tools" aria-current="page">Tools</a><a href="launch.html">Launch clips</a><a href="decks.html">Decks</a><a href="service.html" class="cta-link">Service</a></nav></div></header>
+<main id="main">
+<div class="crumbs"><a href="./#tools">Tools</a><span aria-hidden="true">/</span><span>DeFi</span></div><h1>Impermanent loss calculator</h1>
 <p class="muted">50/50 constant-product AMM position (Uniswap v2 style). Compare holding vs providing liquidity, add fee income, and see where you break even. Everything runs in your browser.</p>
 
 <div class="card">
@@ -123,11 +119,16 @@ footer{text-align:center;padding:30px;color:#7a8a80;font-size:.9rem}
  <div id="capMsg" class="muted" style="margin-top:8px"></div>
 </div>
 </main>
-
-<footer>
- <div><a href="./">← all free tools</a> · made by <a href="https://anonymusk7.github.io/anonymusk/">anonymusk</a> · want studio-grade launch videos? <a href="https://anonymusk.gumroad.com/l/sztuha">Motion pack $29</a> / <a href="https://anonymusk.gumroad.com/l/ksgvlu">Launch kit $79</a></div>
- <div style="margin-top:6px">anonymusk tools</div>
+<footer class="site-footer"><div class="sf-in">
+ <div><a class="brand" href="./"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="amk-g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7d6eff"/><stop offset="1" stop-color="#3fc59f"/></linearGradient></defs><rect width="32" height="32" rx="8" fill="url(#amk-g2)"/><path d="M9 22.5 15.2 8.8a1 1 0 0 1 1.8 0L23 22.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.6 17.4c2.9-1.5 5.9-1.5 8.8 0" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg><span class="w">anony<b>musk</b></span></a><p>Free, in-browser crypto tools. No sign-up, no API keys, no trackers. Built by <a href="https://anonymusk7.github.io/anonymusk/">anonymusk</a>.</p></div>
+ <div><h4>Tools</h4><ul><li><a href="crypto-heatmap.html">Market heatmap</a></li><li><a href="trending.html">Hot token board</a></li><li><a href="holder-map.html">Holder bubble map</a></li><li><a href="wallet-flow.html">Wallet fund-flow</a></li><li><a href="defi-yield-finder.html">DeFi yield finder</a></li><li><a href="./#tools">All tools →</a></li></ul></div>
+ <div><h4>Products</h4><ul><li><a href="report.html">Wallet audit report</a></li><li><a href="launch.html">Launch Clip HD</a></li><li><a href="https://anonymusk.gumroad.com/l/vmpnxc">Pitch deck pack $29</a></li><li><a href="https://anonymusk.gumroad.com/l/sztuha">Motion pack $29</a></li><li><a href="https://anonymusk.gumroad.com/l/ksgvlu">Launch kit $79</a></li></ul></div>
+ <div><h4>Studio</h4><ul><li><a href="service.html">Done-for-you launch videos</a></li><li><a href="decks.html">Pitch deck in 24h</a></li><li><a href="https://anonymusk7.github.io/anonymusk/">Portfolio</a></li><li><a href="https://anonymusk.gumroad.com/">Gumroad store</a></li></ul></div>
+</div>
+<div class="legal"><span><b>Not financial advice.</b> Educational tools only. Data can be delayed, incomplete or wrong. Do your own research.</span><span>Data: CoinGecko · GeckoTerminal · DefiLlama · Blockscout · alternative.me · DexScreener · public RPCs. Each tool credits its sources on the page.</span></div>
 </footer>
+
+
 
 <script>
 (()=>{
@@ -194,17 +195,17 @@ function draw(r){
  cx.clearRect(0,0,W,H);cx.fillStyle='#000';cx.fillRect(0,0,W,H);
  cx.font='13px ui-monospace,Menlo,Consolas,monospace';cx.lineWidth=1;
  // grid
- cx.strokeStyle='#16201a';cx.fillStyle='#7a8a80';cx.textAlign='right';cx.textBaseline='middle';
+ cx.strokeStyle='#1c2030';cx.fillStyle='#8a91a5';cx.textAlign='right';cx.textBaseline='middle';
  for(let y=yMin;y<=yMax;y+=10){cx.beginPath();cx.moveTo(L,Y(y));cx.lineTo(W-R,Y(y));cx.stroke();cx.fillText(y+'%',L-8,Y(y))}
  cx.textAlign='center';cx.textBaseline='top';
  for(const x of[-90,0,100,200,300,400,500]){cx.beginPath();cx.moveTo(X(x),T);cx.lineTo(X(x),T+ph);cx.stroke();cx.fillText((x>0?'+':'')+x+'%',X(x),T+ph+8)}
- cx.strokeStyle='#2a3a30';cx.beginPath();cx.moveTo(X(0),T);cx.lineTo(X(0),T+ph);cx.stroke();
+ cx.strokeStyle='#2a2f42';cx.beginPath();cx.moveTo(X(0),T);cx.lineTo(X(0),T+ph);cx.stroke();
  // curve with gradient fill
  const g=cx.createLinearGradient(0,T,0,T+ph);g.addColorStop(0,'rgba(93,255,176,.02)');g.addColorStop(1,'rgba(167,139,250,.28)');
  cx.beginPath();cx.moveTo(X(PMIN),Y(0));
  const pts=[];for(let i=0;i<=600;i++){const x=PMIN+(PMAX-PMIN)*i/600;pts.push([X(x),Y(il(1+x/100)*100)])}
  pts.forEach(p=>cx.lineTo(p[0],p[1]));cx.lineTo(X(PMAX),Y(0));cx.closePath();cx.fillStyle=g;cx.fill();
- const sg=cx.createLinearGradient(L,0,W-R,0);sg.addColorStop(0,'#a78bfa');sg.addColorStop(.25,'#5dffb0');sg.addColorStop(1,'#a78bfa');
+ const sg=cx.createLinearGradient(L,0,W-R,0);sg.addColorStop(0,'#8b7cff');sg.addColorStop(.25,'#3ddc97');sg.addColorStop(1,'#8b7cff');
  cx.strokeStyle=sg;cx.lineWidth=3;cx.beginPath();pts.forEach((p,i)=>i?cx.lineTo(p[0],p[1]):cx.moveTo(p[0],p[1]));cx.stroke();
  // marker
  let note='';
@@ -214,13 +215,13 @@ function draw(r){
   const px=X(xc),py=Y(Math.max(yMin,yc));
   cx.strokeStyle='rgba(93,255,176,.5)';cx.setLineDash([4,4]);cx.lineWidth=1;
   cx.beginPath();cx.moveTo(px,T+ph);cx.lineTo(px,py);cx.lineTo(L,py);cx.stroke();cx.setLineDash([]);
-  cx.fillStyle='#5dffb0';cx.shadowColor='#5dffb0';cx.shadowBlur=14;cx.beginPath();cx.arc(px,py,7,0,7);cx.fill();cx.shadowBlur=0;
+  cx.fillStyle='#3ddc97';cx.shadowColor='#3ddc97';cx.shadowBlur=14;cx.beginPath();cx.arc(px,py,7,0,7);cx.fill();cx.shadowBlur=0;
   cx.strokeStyle='#04130b';cx.lineWidth=2;cx.stroke();
   const lbl='r '+pct(xr,1)+' → IL '+yv.toFixed(2)+'%';
   cx.font='bold 14px ui-monospace,Menlo,Consolas,monospace';const tw=cx.measureText(lbl).width+16;
   let bx=px+12,by=py-36;if(bx+tw>W-R)bx=px-12-tw;if(by<T)by=py+12;
-  cx.fillStyle='rgba(14,20,17,.92)';cx.strokeStyle='#2b5a40';cx.lineWidth=1;cx.beginPath();cx.roundRect?cx.roundRect(bx,by,tw,24,6):cx.rect(bx,by,tw,24);cx.fill();cx.stroke();
-  cx.fillStyle='#e8f0ea';cx.textAlign='left';cx.textBaseline='middle';cx.fillText(lbl,bx+8,by+12);
+  cx.fillStyle='rgba(14,20,17,.92)';cx.strokeStyle='#3b3570';cx.lineWidth=1;cx.beginPath();cx.roundRect?cx.roundRect(bx,by,tw,24,6):cx.rect(bx,by,tw,24);cx.fill();cx.stroke();
+  cx.fillStyle='#eef0f6';cx.textAlign='left';cx.textBaseline='middle';cx.fillText(lbl,bx+8,by+12);
  }
  $('clampNote').textContent=note;
  cx.fillStyle='rgba(255,255,255,.3)';cx.font='11px ui-monospace,Menlo,Consolas,monospace';cx.textAlign='right';cx.textBaseline='bottom';cx.fillText('anonymusk',W-R-4,T+ph-4);
