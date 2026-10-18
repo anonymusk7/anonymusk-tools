@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://anonymusk7.github.io/anonymusk-tools/sitemap.xml

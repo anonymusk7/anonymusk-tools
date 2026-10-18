@@ -286,3 +286,10 @@ tr.sk-row:hover{background:none}
 .lay>*{min-width:0}
 #graph{width:100%;contain:size layout}
 #graph canvas{display:block;max-width:100%}
+
+/* cross-sell callout (contextual product links) */
+.xsell{display:flex;align-items:center;justify-content:space-between;gap:var(--s4);flex-wrap:wrap;margin:var(--s5) 0;padding:var(--s4) var(--s5);border-radius:var(--r-lg);border:1px solid var(--border-glow);background:var(--grad-card),var(--surface);box-shadow:var(--sh-2);color:var(--text-2)}
+.xsell>div{flex:1 1 320px;min-width:0}
+.xsell b{display:block;margin:8px 0 4px;color:var(--text);font-size:var(--fs-md)}
+.xsell p{margin:0;font-size:var(--fs-sm);color:var(--text-3)}
+.xsell .btn{flex:0 0 auto}
