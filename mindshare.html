@@ -1,0 +1,70 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>Crypto mindshare treemap: share of X chatter for trending coins | anonymusk</title>
+<meta name=description content="Free crypto mindshare treemap. Share of X posts across the coins trending on CoinGecko, by day, with change vs the prior days. Transparent method, dated snapshot.">
+<meta name=theme-color content="#07090c">
+<link rel=stylesheet href=style.css><script src=common.js></script>
+<style>
+main{max-width:1200px}
+#map{position:relative;width:100%;height:560px;background:#000;border:1px solid #1d2a22;border-radius:14px;overflow:hidden}
+@media(max-width:600px){#map{height:480px}}
+.t{position:absolute;box-sizing:border-box;border:1px solid #07090c;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff;line-height:1.15;cursor:pointer;transition:filter .15s}
+.t:hover,.t.sel{filter:brightness(1.25);outline:2px solid #e8f0ea;outline-offset:-2px;z-index:2}
+.t img{border-radius:50%;margin-bottom:4px}
+.t b{text-shadow:0 1px 2px rgba(0,0,0,.6)}.t .m{font-family:ui-monospace,Menlo,monospace;opacity:.9;font-size:.85em}
+.seg{display:inline-flex;border:1px solid #2a3a30;border-radius:10px;overflow:hidden}.seg button{background:#101612;color:#9fb;border-radius:0;padding:8px 12px;font-weight:700}.seg button[aria-pressed=true]{background:linear-gradient(90deg,#5dffb0,#7a8cff);color:#04130b}
+.up{color:#5dffb0}.dn{color:#ff5d7a}.err{color:#ff8a9e}
+table{width:100%;border-collapse:collapse;font-size:.88rem}th,td{padding:6px 8px;border-bottom:1px solid #1d2a22;text-align:right}th:nth-child(2),td:nth-child(2){text-align:left}
+.tw{overflow-x:auto}
+.spark{vertical-align:middle}
+.mono{font-family:ui-monospace,Menlo,monospace;font-size:.8rem}
+</style></head><body><main>
+<h1>🧠 Crypto mindshare treemap</h1>
+<p class=muted>Which trending coins is X actually talking about? Tile size = share of X posts across the tracked coins. Colour = change in that share on the latest day vs the days before. This is a dated snapshot with a published method, not a live feed.</p>
+<div class="card row">
+ <span class=seg id=win><button data-w=1>Latest day</button><button data-w=3>3 days</button><button data-w=6 aria-pressed=true>6 days</button></span>
+ <span class=muted id=stamp>loading…</span>
+</div>
+<div id=map role=img aria-label="Mindshare treemap"></div>
+<div class=row style="justify-content:space-between;margin:6px 0"><span class=muted style="font-size:.8rem"><span class=dn>■</span> share falling · <span style="color:#56645c">■</span> flat · <span class=up>■</span> share rising (latest day vs earlier avg)</span><a href="mindshare.json" class=muted style="font-size:.8rem">raw mindshare.json</a></div>
+<div class="card tw"><table><thead><tr><th>#</th><th>Coin</th><th>Mindshare</th><th>Posts</th><th>Daily posts</th><th>Δ share</th><th>24h price</th></tr></thead><tbody id=tb></tbody></table></div>
+<div class=card style="font-size:.85rem"><b>Method & sources</b><div id=method class=muted></div><div id=srcs></div><div class=muted style="margin-top:6px">Each coin's X keyword query is listed when you hover a tile and in the JSON. "Share" is of this tracked set only, not of all crypto talk. We do no engagement, bot or "smart account" weighting, so busy generic words (bitcoin, solana) will dominate.</div></div>
+<p class=muted style="font-size:.85rem">Not financial advice. Attention is not a buy signal and this page makes no predictions. Coin data from <a href="https://www.coingecko.com/" target=_blank rel=noopener>CoinGecko</a>. Want to see who holds a token? <a href="holder-map.html">Holder bubble map →</a> · Deep dive on one wallet: <a href="report.html">Wallet audit report →</a></p>
+</main>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const safeImg=u=>/^https:\/\/[a-z0-9.-]+\.coingecko\.com\//i.test(u||'')?u:'';
+const safeUrl=u=>/^https:\/\//i.test(u||'')?u:'#';
+let D=null,W=6,SEL=null;
+function squarify(items,x,y,w,h){const out=[];const tot=items.reduce((s,i)=>s+i.v,0);if(!tot)return out;const sc=w*h/tot;let rest=items.map(i=>({...i,a:i.v*sc}));
+ while(rest.length){const short=Math.min(w,h);let row=[],best=Infinity;
+  for(let i=0;i<rest.length;i++){const r=rest.slice(0,i+1),s=r.reduce((a,b)=>a+b.a,0),mx=Math.max(...r.map(z=>z.a)),mn=Math.min(...r.map(z=>z.a));const worst=Math.max(short*short*mx/(s*s),s*s/(short*short*mn));if(worst<=best){best=worst;row=r}else break}
+  const s=row.reduce((a,b)=>a+b.a,0),th=s/short;let o=0;
+  for(const r of row){const l=r.a/th;if(w>=h)out.push({...r,x,y:y+o,w:th,h:l});else out.push({...r,x:x+o,y,w:l,h:th});o+=l}
+  if(w>=h){x+=th;w-=th}else{y+=th;h-=th}rest=rest.slice(row.length)}return out}
+function compute(){const days=Object.keys(D.universe[0].x_daily).sort();const win=days.slice(-W),prev=days.slice(0,-1),lastD=days[days.length-1];
+ const tot=d=>D.universe.reduce((s,u)=>s+(u.x_daily[d]||0),0);
+ const winTot=win.reduce((s,d)=>s+tot(d),0);
+ return{days,win,rows:D.universe.map(u=>{const posts=win.reduce((s,d)=>s+(u.x_daily[d]||0),0);const ms=winTot?posts/winTot:0;
+  const shL=(u.x_daily[lastD]||0)/(tot(lastD)||1);const shP=prev.reduce((s,d)=>s+(u.x_daily[d]||0)/(tot(d)||1),0)/(prev.length||1);
+  return{...u,posts,ms,dbps:(shL-shP)*1e4,drel:shP?shL/shP-1:0}}).sort((a,b)=>b.ms-a.ms)}}
+function color(r){const t=Math.max(-1,Math.min(1,r.drel/0.6));if(Math.abs(t)<.04)return'#3a463f';return t>0?`hsl(150,${40+50*t}%,${22+18*t}%)`:`hsl(350,${40-50*t}%,${22-18*t}%)`}
+function spark(u,days){const v=days.map(d=>u.x_daily[d]||0),mx=Math.max(...v)||1;return`<svg class=spark width=70 height=20 viewBox="0 0 70 20"><polyline fill=none stroke="#5dffb0" stroke-width=1.5 points="${v.map((x,i)=>(i*70/(v.length-1)).toFixed(1)+','+(19-x/mx*17).toFixed(1)).join(' ')}"/></svg>`}
+function draw(){const C=compute();const el=$('map');const W0=el.clientWidth,H0=el.clientHeight;
+ const tiles=squarify(C.rows.filter(r=>r.ms>0).map(r=>({...r,v:r.ms})),0,0,W0,H0);
+ el.innerHTML=tiles.map(t=>{const big=Math.min(t.w,t.h);const fs=Math.max(9,Math.min(30,big/5));const img=safeImg(t.logo);
+  return`<div class="t${SEL===t.id?' sel':''}" data-id="${esc(t.id)}" style="left:${t.x}px;top:${t.y}px;width:${t.w}px;height:${t.h}px;background:${color(t)};font-size:${fs}px" title="${esc(t.name)} · ${(t.ms*100).toFixed(2)}% · ${t.posts.toLocaleString()} posts\nX query: ${esc(t.x_query)}">
+  ${img&&big>70?`<img src="${esc(img)}" width=${Math.min(36,big/4)|0} height=${Math.min(36,big/4)|0} alt="" referrerpolicy=no-referrer>`:''}${big>22?`<b>${esc(t.ticker)}</b>`:''}${big>44?`<span class=m>${(t.ms*100).toFixed(t.ms>.1?1:2)}%</span>`:''}${big>90?`<span class=m style="font-size:.6em">${t.dbps>=0?'+':''}${Math.round(t.dbps)} bps</span>`:''}</div>`}).join('');
+ el.querySelectorAll('.t').forEach(d=>d.onclick=()=>{SEL=d.dataset.id;draw();document.querySelector(`tr[data-id="${CSS.escape(SEL)}"]`)?.scrollIntoView({block:'nearest',behavior:'smooth'})});
+ $('tb').innerHTML=C.rows.map((r,i)=>`<tr data-id="${esc(r.id)}" style="${SEL===r.id?'background:#101612':''}"><td>${i+1}</td><td><b>${esc(r.ticker)}</b> <span class=muted>${esc(r.name)}</span> <span class=muted style="font-size:.75rem">· CG trending #${esc(r.cg_trending_rank)}</span></td><td class=mono>${(r.ms*100).toFixed(2)}%</td><td class=mono>${r.posts.toLocaleString()}</td><td>${spark(r,C.days)}</td><td class="mono ${r.dbps>=0?'up':'dn'}">${r.dbps>=0?'+':''}${Math.round(r.dbps)} bps</td><td class="mono ${r.price_change_24h_pct>=0?'up':'dn'}">${r.price_change_24h_pct!=null?(r.price_change_24h_pct>0?'+':'')+(+r.price_change_24h_pct).toFixed(1)+'%':'—'}</td></tr>`).join('');
+ $('stamp').innerHTML=`Window: ${esc(C.win[0])} → ${esc(C.win[C.win.length-1])} (UTC days) · snapshot generated ${esc(new Date(D.generatedAt).toLocaleString())} · universe = CoinGecko trending at ${esc(new Date(D.trendingSnapshotAt||D.generatedAt).toLocaleString())}`}
+async function init(){try{const r=await fetch('mindshare.json',{cache:'no-cache'});if(!r.ok)throw new Error('HTTP '+r.status);D=await r.json();
+  if(!Array.isArray(D.universe)||!D.universe.length||!D.universe[0].x_daily)throw new Error('unexpected file format');
+  $('method').textContent=String(D.method||'');$('srcs').innerHTML='Sources: '+(D.sources||[]).map(s=>`<a href="${esc(safeUrl(s.url))}" target=_blank rel=noopener>${esc(s.name)}</a>`).join(' · ');
+  const age=(Date.now()-Date.parse(D.generatedAt))/864e5;if(age>3)$('method').insertAdjacentHTML('beforebegin',`<div class=err>This snapshot is ${Math.floor(age)} days old.</div>`);
+  draw()}catch(e){$('map').innerHTML=`<div style="padding:30px;text-align:center" class=err>Could not load mindshare.json: ${esc(e.message)}</div>`;$('stamp').textContent=''}}
+$('win').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('win').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));W=+b.dataset.w;D&&draw()});
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>D&&draw(),150)});
+init();
+</script></body></html>

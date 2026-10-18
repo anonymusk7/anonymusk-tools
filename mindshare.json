@@ -1,0 +1,322 @@
+{
+ "trendingSnapshotAt": "2026-10-18T01:00:04Z",
+ "generatedAt": "2026-10-18T01:01:57Z",
+ "window": {
+  "start": "2026-10-12T00:00:00Z",
+  "end": "2026-10-18T00:00:00Z",
+  "granularity": "day (UTC)"
+ },
+ "method": "Universe = the 15 coins on CoinGecko /search/trending at generation time. Attention = count of original posts on X (retweets excluded) matching each coin's keyword query, from the X API v2 recent counts endpoint, per UTC day. Mindshare = a coin's posts / sum of posts across the tracked set for the window (share of tracked set, NOT the whole market). Change = share on the last day vs average share over the earlier days. Keyword queries are approximate: generic words (e.g. bitcoin, solana) catch non-trading chatter and ambiguous names are narrowed, so compare with care. No engagement or \"smart account\" weighting.",
+ "sources": [
+  {
+   "name": "X API v2 posts counts (recent)",
+   "url": "https://docs.x.com/x-api/posts/counts/introduction"
+  },
+  {
+   "name": "CoinGecko trending (keyless)",
+   "url": "https://www.coingecko.com/"
+  }
+ ],
+ "universe": [
+  {
+   "id": "bitcoin",
+   "ticker": "BTC",
+   "name": "Bitcoin",
+   "logo": "https://coin-images.coingecko.com/coins/images/1/small/bitcoin.png?1696501400",
+   "cg_trending_rank": 1,
+   "market_cap_rank": 1,
+   "price_usd": 81433.78882320566,
+   "price_change_24h_pct": 0.019536481631447215,
+   "market_cap": "$1,636,724,936,453",
+   "x_query": "(BTC OR bitcoin) -is:retweet",
+   "x_daily": {
+    "2026-10-12": 93432,
+    "2026-10-13": 89245,
+    "2026-10-14": 86508,
+    "2026-10-15": 90267,
+    "2026-10-16": 82395,
+    "2026-10-17": 69767
+   }
+  },
+  {
+   "id": "quack-ai",
+   "ticker": "Q",
+   "name": "Quack AI",
+   "logo": "https://coin-images.coingecko.com/coins/images/68793/small/quack_ai.png?1756615808",
+   "cg_trending_rank": 2,
+   "market_cap_rank": 105,
+   "price_usd": 0.13064189698016657,
+   "price_change_24h_pct": 115.04133195833097,
+   "market_cap": "$614,916,904",
+   "x_query": "(\"Quack AI\" OR QuackAI) -is:retweet",
+   "x_daily": {
+    "2026-10-12": 13,
+    "2026-10-13": 39,
+    "2026-10-14": 36,
+    "2026-10-15": 24,
+    "2026-10-16": 18,
+    "2026-10-17": 124
+   }
+  },
+  {
+   "id": "pudgy-penguins",
+   "ticker": "PENGU",
+   "name": "Pudgy Penguins",
+   "logo": "https://coin-images.coingecko.com/coins/images/52622/small/PUDGY_PENGUINS_PENGU_PFP.png?1733809110",
+   "cg_trending_rank": 3,
+   "market_cap_rank": 120,
+   "price_usd": 0.007433462520532025,
+   "price_change_24h_pct": -1.2133907988531922,
+   "market_cap": "$467,270,398",
+   "x_query": "(PENGU OR \"Pudgy Penguins\") -is:retweet",
+   "x_daily": {
+    "2026-10-12": 3983,
+    "2026-10-13": 3933,
+    "2026-10-14": 2304,
+    "2026-10-15": 1844,
+    "2026-10-16": 1800,
+    "2026-10-17": 1494
+   }
+  },
+  {
+   "id": "quantus",
+   "ticker": "QTC",
+   "name": "Quantus",
+   "logo": "https://coin-images.coingecko.com/coins/images/102171910/small/Token_Icon.png?1791345433",
+   "cg_trending_rank": 4,
+   "market_cap_rank": 634,
+   "price_usd": 109.25997509371312,
+   "price_change_24h_pct": -5.391691569230779,
+   "market_cap": "$31,570,020",
+   "x_query": "Quantus -is:retweet",
+   "x_daily": {
+    "2026-10-12": 254,
+    "2026-10-13": 821,
+    "2026-10-14": 515,
+    "2026-10-15": 266,
+    "2026-10-16": 305,
+    "2026-10-17": 176
+   }
+  },
+  {
+   "id": "solana",
+   "ticker": "SOL",
+   "name": "Solana",
+   "logo": "https://coin-images.coingecko.com/coins/images/4128/small/solana.png?1718769756",
+   "cg_trending_rank": 5,
+   "market_cap_rank": 7,
+   "price_usd": 103.37115345816957,
+   "price_change_24h_pct": -0.651860119610586,
+   "market_cap": "$60,925,093,564",
+   "x_query": "solana -is:retweet",
+   "x_daily": {
+    "2026-10-12": 65012,
+    "2026-10-13": 62996,
+    "2026-10-14": 62723,
+    "2026-10-15": 65643,
+    "2026-10-16": 60405,
+    "2026-10-17": 52263
+   }
+  },
+  {
+   "id": "injective-protocol",
+   "ticker": "INJ",
+   "name": "Injective",
+   "logo": "https://coin-images.coingecko.com/coins/images/12882/small/Other_200x200.png?1738782212",
+   "cg_trending_rank": 6,
+   "market_cap_rank": 84,
+   "price_usd": 8.58897192687222,
+   "price_change_24h_pct": -1.2724161322977081,
+   "market_cap": "$858,897,193",
+   "x_query": "injective -is:retweet",
+   "x_daily": {
+    "2026-10-12": 5618,
+    "2026-10-13": 6486,
+    "2026-10-14": 6611,
+    "2026-10-15": 6838,
+    "2026-10-16": 8270,
+    "2026-10-17": 7173
+   }
+  },
+  {
+   "id": "near",
+   "ticker": "NEAR",
+   "name": "NEAR Protocol",
+   "logo": "https://coin-images.coingecko.com/coins/images/10365/small/near.jpg?1696510367",
+   "cg_trending_rank": 7,
+   "market_cap_rank": 20,
+   "price_usd": 4.859883867185447,
+   "price_change_24h_pct": -2.6444054023965458,
+   "market_cap": "$6,362,769,736",
+   "x_query": "(\"NEAR Protocol\" OR NEARProtocol) -is:retweet",
+   "x_daily": {
+    "2026-10-12": 1339,
+    "2026-10-13": 1518,
+    "2026-10-14": 1291,
+    "2026-10-15": 1299,
+    "2026-10-16": 825,
+    "2026-10-17": 605
+   }
+  },
+  {
+   "id": "canton-network",
+   "ticker": "CC",
+   "name": "Canton",
+   "logo": "https://coin-images.coingecko.com/coins/images/70468/small/Canton-Ticker_%281%29.png?1762826299",
+   "cg_trending_rank": 8,
+   "market_cap_rank": 28,
+   "price_usd": 0.10312785236763422,
+   "price_change_24h_pct": -0.3231259949415269,
+   "market_cap": "$4,111,048,745",
+   "x_query": "(\"Canton Network\" OR \"Canton Coin\") -is:retweet",
+   "x_daily": {
+    "2026-10-12": 114,
+    "2026-10-13": 338,
+    "2026-10-14": 202,
+    "2026-10-15": 130,
+    "2026-10-16": 150,
+    "2026-10-17": 148
+   }
+  },
+  {
+   "id": "zcash",
+   "ticker": "ZEC",
+   "name": "Zcash",
+   "logo": "https://coin-images.coingecko.com/coins/images/486/small/Brandmark-Yellow_%281%29.png?1785810558",
+   "cg_trending_rank": 9,
+   "market_cap_rank": 10,
+   "price_usd": 1122.054094574602,
+   "price_change_24h_pct": -1.664134260219956,
+   "market_cap": "$19,064,637,220",
+   "x_query": "(zcash OR ZEC) -is:retweet",
+   "x_daily": {
+    "2026-10-12": 5852,
+    "2026-10-13": 6059,
+    "2026-10-14": 6116,
+    "2026-10-15": 5886,
+    "2026-10-16": 4892,
+    "2026-10-17": 4363
+   }
+  },
+  {
+   "id": "bittensor",
+   "ticker": "TAO",
+   "name": "Bittensor",
+   "logo": "https://coin-images.coingecko.com/coins/images/28452/small/ARUsPeNQ_400x400.jpeg?1696527447",
+   "cg_trending_rank": 10,
+   "market_cap_rank": 36,
+   "price_usd": 269.43155151812397,
+   "price_change_24h_pct": -1.420763616891449,
+   "market_cap": "$3,055,258,395",
+   "x_query": "bittensor -is:retweet",
+   "x_daily": {
+    "2026-10-12": 512,
+    "2026-10-13": 445,
+    "2026-10-14": 430,
+    "2026-10-15": 555,
+    "2026-10-16": 592,
+    "2026-10-17": 406
+   }
+  },
+  {
+   "id": "lighter",
+   "ticker": "LIT",
+   "name": "Lighter",
+   "logo": "https://coin-images.coingecko.com/coins/images/71121/small/lighter.png?1765888098",
+   "cg_trending_rank": 11,
+   "market_cap_rank": 89,
+   "price_usd": 3.124136684086798,
+   "price_change_24h_pct": -0.8675098059643347,
+   "market_cap": "$781,034,171",
+   "x_query": "(\"Lighter xyz\" OR lighter_xyz OR (Lighter (perp OR perps OR LIT))) -is:retweet",
+   "x_daily": {
+    "2026-10-12": 949,
+    "2026-10-13": 756,
+    "2026-10-14": 903,
+    "2026-10-15": 624,
+    "2026-10-16": 2893,
+    "2026-10-17": 821
+   }
+  },
+  {
+   "id": "pump-fun",
+   "ticker": "PUMP",
+   "name": "Pump.fun",
+   "logo": "https://coin-images.coingecko.com/coins/images/67164/small/pump.jpg?1751949376",
+   "cg_trending_rank": 12,
+   "market_cap_rank": 49,
+   "price_usd": 0.004335517645212467,
+   "price_change_24h_pct": -3.5100198452444475,
+   "market_cap": "$2,005,440,524",
+   "x_query": "(\"pump.fun\" OR pumpfun) -is:retweet",
+   "x_daily": {
+    "2026-10-12": 19013,
+    "2026-10-13": 19636,
+    "2026-10-14": 20004,
+    "2026-10-15": 18460,
+    "2026-10-16": 24191,
+    "2026-10-17": 21506
+   }
+  },
+  {
+   "id": "ethereum",
+   "ticker": "ETH",
+   "name": "Ethereum",
+   "logo": "https://coin-images.coingecko.com/coins/images/279/small/ethereum.png?1696501628",
+   "cg_trending_rank": 13,
+   "market_cap_rank": 2,
+   "price_usd": 2402.5441738832023,
+   "price_change_24h_pct": -0.5504762743579821,
+   "market_cap": "$293,452,657,481",
+   "x_query": "ethereum -is:retweet",
+   "x_daily": {
+    "2026-10-12": 15284,
+    "2026-10-13": 14170,
+    "2026-10-14": 14116,
+    "2026-10-15": 15703,
+    "2026-10-16": 13668,
+    "2026-10-17": 10920
+   }
+  },
+  {
+   "id": "ondo-finance",
+   "ticker": "ONDO",
+   "name": "Ondo",
+   "logo": "https://coin-images.coingecko.com/coins/images/26580/small/ONDO.png?1696525656",
+   "cg_trending_rank": 14,
+   "market_cap_rank": 48,
+   "price_usd": 0.43789355040725153,
+   "price_change_24h_pct": -2.5184745312944257,
+   "market_cap": "$2,132,248,485",
+   "x_query": "(\"Ondo Finance\" OR ONDO) -is:retweet",
+   "x_daily": {
+    "2026-10-12": 4865,
+    "2026-10-13": 4660,
+    "2026-10-14": 5170,
+    "2026-10-15": 5028,
+    "2026-10-16": 3353,
+    "2026-10-17": 3573
+   }
+  },
+  {
+   "id": "raydium",
+   "ticker": "RAY",
+   "name": "Raydium",
+   "logo": "https://coin-images.coingecko.com/coins/images/13928/small/PSigc4ie_400x400.jpg?1696513668",
+   "cg_trending_rank": 15,
+   "market_cap_rank": 118,
+   "price_usd": 1.7904479270381652,
+   "price_change_24h_pct": -2.1215575268890765,
+   "market_cap": "$483,355,719",
+   "x_query": "raydium -is:retweet",
+   "x_daily": {
+    "2026-10-12": 949,
+    "2026-10-13": 774,
+    "2026-10-14": 1105,
+    "2026-10-15": 906,
+    "2026-10-16": 1319,
+    "2026-10-17": 823
+   }
+  }
+ ]
+}

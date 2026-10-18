@@ -1,0 +1,231 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>Token holder bubble map: clusters by shared funders | anonymusk</title>
+<meta name=description content="Free token holder bubble map. Top holders of any ERC-20 as bubbles, linked by direct transfers and shared first funders. Clusters, decentralization score, CSV. Blockscout data, runs in your browser.">
+<meta name=theme-color content="#07090c">
+<link rel=stylesheet href=style.css><script src=common.js></script>
+<script src="https://cdn.jsdelivr.net/npm/force-graph@1/dist/force-graph.min.js"></script>
+<style>
+main{max-width:1200px}
+.lay{display:grid;grid-template-columns:1fr 300px;gap:12px}
+@media(max-width:860px){.lay{grid-template-columns:1fr}}
+#graph{position:relative;height:620px;background:#000;border:1px solid #1d2a22;border-radius:14px;overflow:hidden}
+@media(max-width:600px){#graph{height:460px}}
+#ov{position:absolute;inset:0;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;background:rgba(7,9,12,.85);z-index:5;text-align:center;padding:20px}
+#ov[hidden]{display:none}
+.bar{width:240px;height:8px;border-radius:9px;background:#1d2a22;overflow:hidden}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#5dffb0,#7a8cff)}
+.side{max-height:620px;overflow:auto}
+.side .card{margin:0 0 10px}
+.cl{display:flex;justify-content:space-between;gap:8px;padding:6px 8px;border-radius:8px;cursor:pointer;font-size:.88rem}.cl:hover{background:#101612}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.85rem;word-break:break-all}
+.chk{display:inline-flex;gap:6px;align-items:center;font-size:.9rem}.chk input{width:auto;padding:0}
+.big{font-size:2rem;font-weight:800}
+.pill{font-size:.8rem;padding:3px 9px;border-radius:99px;border:1px solid #2a3a30;color:#9fb}
+.err{color:#ff8a9e}
+#addr{min-width:min(420px,100%);flex:1}
+table{width:100%;border-collapse:collapse;font-size:.85rem}td{padding:2px 4px;border-bottom:1px solid #1d2a22}
+.pro{border-color:#2b5a40;background:linear-gradient(135deg,#0c1712,#0e1020)}
+</style></head><body><main>
+<h1>🫧 Token holder bubble map</h1>
+<p class=muted>Top holders of an ERC-20 as bubbles (size = share of supply). Lines = direct transfers of this token between holders, or a shared <b>first funder</b> (the address that sent each wallet its first ETH). Linked groups = clusters. Exchanges, contracts and burn addresses are hidden by default.</p>
+<div class="card row">
+ <select id=chain aria-label=Chain><option value=eth>Ethereum</option><option value=base>Base</option><option value=arbitrum>Arbitrum</option><option value=optimism>Optimism</option></select>
+ <input id=addr placeholder="Token contract 0x…" value="0x6982508145454Ce325dDbE47a25d4ec3d2311933" aria-label="Token contract">
+ <select id=n aria-label="Holders"><option>50</option><option selected>100</option><option>150</option></select>
+ <button id=go>Map holders</button>
+</div>
+<div class=row style="margin:6px 0">
+ <span class=muted>Examples:</span>
+ <a href="#eth:0x6982508145454Ce325dDbE47a25d4ec3d2311933" class=ex>PEPE</a>
+ <a href="#eth:0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984" class=ex>UNI</a>
+ <a href="#eth:0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE" class=ex>SHIB</a>
+ <a href="#eth:0x514910771AF9Ca656af840dff83E8264EcF986CA" class=ex>LINK</a>
+ <label class=chk><input type=checkbox id=showHidden> show exchanges/contracts</label>
+ <label class=chk><input type=checkbox id=tA checked> direct transfers</label>
+ <label class=chk><input type=checkbox id=tB checked> shared funders</label>
+</div>
+<div class=lay>
+ <div><div id=graph><div id=ov><div>Paste a token contract and press <b>Map holders</b>.</div></div></div>
+ <p class=muted style="font-size:.82rem" id=meta></p></div>
+ <div class=side>
+  <div class=card><div class=muted>Decentralization score (ours)</div><div class=big id=score>—</div><div class=muted style="font-size:.8rem" id=scoreNote>Treats each cluster as one owner. 100 = spread out. Our own transparent formula, not Bubblemaps'.</div></div>
+  <div class=card id=detail><b>Click a bubble</b><div class=muted style="font-size:.85rem">Details, cluster totals and links show here.</div></div>
+  <div class=card><b>Clusters</b> <button class=btn2 id=csv style="float:right;padding:4px 10px;font-size:.8rem;background:#101612;color:#5dffb0;border:1px solid #2a3a30">CSV</button><div id=clusters class=muted style="font-size:.85rem;margin-top:8px">—</div></div>
+  <div class="card pro"><b>🧾 Want the full picture on one wallet?</b><br><span class=muted style="font-size:.9rem">Holdings on 8 chains, open approvals, risk grade A–F, printable PDF.</span><br><a href="report.html">Wallet audit report →</a></div>
+ </div>
+</div>
+<div class=card style="font-size:.85rem" class=muted>
+<b>How it works & limits.</b> Holders and labels: <a href="https://eth.blockscout.com/" target=_blank rel=noopener>Blockscout</a> public API (v2 holders; tags show exchanges). Links: (A) this token's transfers between top holders in the most recent 200k blocks (about 4 weeks on Ethereum, a few days on Base/Optimism, under a day on Arbitrum), read from Transfer logs via free public RPCs (Flashbots, PublicNode, chain-operator endpoints). Public RPCs often refuse or time out on log queries, so the window actually scanned is printed under the map and can be shorter, or empty; (B) each holder's first incoming native transfer ("first funder"). A funder shared by 2+ holders becomes a dotted bubble. If that funder is a labelled exchange, holders are only linked when funded in the same 10-minute window, because thousands of strangers withdraw from the same exchange. This is a transparent approximation: we don't see cross-token or cross-chain links, and a link is not proof of common ownership. Results are cached in your browser for 6 hours. Blockscout limits free use (we throttle to about 4 requests/s and back off on HTTP 429). A 100-holder map takes roughly 30–60 seconds the first time.
+</div>
+<p class=muted style="font-size:.85rem">Not financial advice. On-chain links are hints, not proof. Verify on a block explorer.</p>
+</main>
+<script>
+'use strict';
+const HOSTS={eth:'https://eth.blockscout.com',base:'https://base.blockscout.com',arbitrum:'https://arbitrum.blockscout.com',optimism:'https://optimism.blockscout.com'};
+const PAL=['#5dffb0','#7a8cff','#ffb35d','#ff5d9e','#5dd8ff','#c55dff','#ffe45d','#ff7a5d','#9dff5d','#5dffe8'];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const short=a=>a?a.slice(0,6)+'…'+a.slice(-4):'';
+const isAddr=a=>/^0x[0-9a-fA-F]{40}$/.test(a);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+let G=null,DATA=null,abort=0;
+const RPCS={eth:['https://rpc.flashbots.net','https://ethereum-rpc.publicnode.com'],base:['https://base-rpc.publicnode.com','https://mainnet.base.org'],arbitrum:['https://arb1.arbitrum.io/rpc','https://arbitrum-one-rpc.publicnode.com'],optimism:['https://optimism-rpc.publicnode.com','https://mainnet.optimism.io']};
+const TOPIC='0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',CHUNKS=20;
+async function rpc1(url,method,params){const r=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:1,method,params})});
+ if(!r.ok)throw new Error('RPC HTTP '+r.status);const j=await r.json();if(j.error)throw new Error(String(j.error.message||'rpc error'));return j.result}
+async function rpc(chain,method,params){let err;for(const u of RPCS[chain]){for(let i=0;i<2;i++){try{return await rpc1(u,method,params)}catch(e){err=e;await sleep(400)}}}throw err||new Error('RPC busy')}
+// throttled fetch: ~4 req/s, retry on 429/5xx
+let last=0;
+async function jget(url,tries=4){
+ for(let i=0;i<tries;i++){
+  const wait=Math.max(0,last+260-Date.now());last=Date.now()+wait;if(wait)await sleep(wait);
+  try{const r=await fetch(url,{headers:{accept:'application/json'}});
+   if(r.status===429||r.status>=500){await sleep(1500*(i+1)*(i+1));continue}
+   if(!r.ok)throw new Error('HTTP '+r.status);return await r.json()}
+  catch(e){if(i===tries-1)throw e;await sleep(1000*(i+1))}
+ }throw new Error('rate limited, try again in a minute')}
+function ov(html,p){const o=$('ov');o.hidden=false;o.innerHTML=html+(p!=null?`<div class=bar><i style="width:${Math.round(p*100)}%"></i></div>`:'')}
+function tagsOf(a){return(a?.metadata?.tags||[]).map(t=>String(t.name||'')).filter(Boolean)}
+function classify(a){const tg=tagsOf(a).join(' ').toLowerCase();const h=(a.hash||'').toLowerCase();
+ if(/^0x0{40}$/.test(h)||/^0x0{36}dead$/.test(h)||/dead|burn|null/.test(tg))return'burn';
+ if(/exchange|hot wallet|binance|coinbase|okx|kraken|bybit|kucoin|gate\.io|htx|bitget|crypto\.com|cex/.test(tg))return'cex';
+ if(a.is_contract)return'contract';return'holder'}
+function label(a){const t=a?.metadata?.tags?.find(t=>t.tagType==='name');return t?String(t.name):(a?.name||a?.ens_domain_name||'')}
+function cacheKey(c,t,n){return'hm8:'+c+':'+t.toLowerCase()+':'+n}
+
+async function build(chain,token,N){
+ const my=++abort,H=HOSTS[chain];
+ ov('Loading token…',0);
+ const tk=await jget(`${H}/api/v2/tokens/${token}`);
+ if(!tk||!tk.total_supply)throw new Error('Not an ERC-20 token on this chain (no total supply).');
+ const dec=+tk.decimals||0,sup=Number(tk.total_supply)/10**dec,price=+tk.exchange_rate||0;
+ const holders=[];let np=null;
+ while(holders.length<N){
+  const q=np?'?'+new URLSearchParams(np):'';const r=await jget(`${H}/api/v2/tokens/${token}/holders${q}`);
+  if(my!==abort)return null;
+  for(const it of r.items||[])holders.push(it);ov(`Loading holders… ${holders.length}/${N}`,holders.length/N*0.15);
+  if(!r.next_page_params)break;np=r.next_page_params}
+ const nodes=holders.slice(0,N).map((it,i)=>{const a=it.address||{};const bal=Number(it.value)/10**dec;
+  return{id:String(a.hash).toLowerCase(),addr:String(a.hash),rank:i+1,bal,share:sup?bal/sup*100:0,kind:classify(a),label:label(a),tags:tagsOf(a).slice(0,6),contract:!!a.is_contract}});
+ const set=new Set(nodes.map(n=>n.id));
+ const vis=nodes.filter(n=>n.kind==='holder');
+ const edges=new Map();// key from|to|tier
+ const addE=(s,t,tier,amt,ts)=>{if(s===t)return;const k=[s,t].sort().join('|')+'|'+tier;const e=edges.get(k)||{source:s,target:t,tier,count:0,amt:0,last:0};e.count++;e.amt+=amt||0;e.last=Math.max(e.last,ts||0);edges.set(k,e)};
+ const fund={};let done=0;const tot=vis.length;const errs=[];
+ // tier A: Transfer logs between top holders, recent window, via public RPC (10k-block chunks)
+ let logStop=false;const pad=a=>'0x'+'0'.repeat(24)+a.slice(2);const hs=vis.map(n=>pad(n.id));let win=null;
+ try{const bn=parseInt((await rpc(chain,'eth_blockNumber',[])),16)-10;let lo=bn;
+  for(let c=0;c<CHUNKS;c++){if(my!==abort)return null;const to=bn-c*10000,from=to-9999;ov(`Reading on-chain transfers between holders… ${c+1}/${CHUNKS}`,.15+.25*(c+1)/CHUNKS);
+   try{const logs=await rpc(chain,'eth_getLogs',[{address:token,fromBlock:'0x'+from.toString(16),toBlock:'0x'+to.toString(16),topics:[TOPIC,hs,hs]}]);
+    for(const l of logs||[]){const f='0x'+l.topics[1].slice(26),t='0x'+l.topics[2].slice(26);addE(f,t,'A',Number(BigInt(l.data==='0x'?0:l.data))/10**dec,parseInt(l.blockNumber,16))}lo=from}catch(e){logStop=true;break}}
+  let t0=null,t1=null;try{const [b0,b1]=await Promise.all([rpc(chain,'eth_getBlockByNumber',['0x'+lo.toString(16),false]),rpc(chain,'eth_getBlockByNumber',['0x'+bn.toString(16),false])]);t0=parseInt(b0.timestamp,16)*1000;t1=parseInt(b1.timestamp,16)*1000}catch(e){}
+  win={from:lo,to:bn,t0,t1,stop:logStop}}catch(e){errs.push('rpc')}
+ // tier A + B per visible holder
+ const work=vis.map(n=>async()=>{
+  try{const r=await jget(`${H}/api/v2/addresses/${n.addr}/transactions?sort=block_number&order=asc`);
+   const first=(r&&Array.isArray(r.items)?r.items.slice(0,10):[]).map(t=>({to:t.to?.hash||'',from:t.from?.hash||'',value:String(t.value||'0'),timeStamp:Date.parse(t.timestamp)/1000})).find(t=>String(t.to).toLowerCase()===n.id&&t.value!=='0');
+   if(first){const f=String(first.from).toLowerCase();(fund[f]=fund[f]||[]).push({id:n.id,ts:first.timeStamp,v:Number(first.value)/1e18});n.funder=f;n.fundTs=first.timeStamp}}catch(e){errs.push('B '+short(n.addr))}
+  done++;ov(`Finding first funders… ${done}/${tot}`,.4+.6*done/tot)});
+ let wi=0;await Promise.all([0,1].map(async()=>{while(wi<work.length){if(my!==abort)return;await work[wi++]()}}));
+ if(my!==abort)return null;
+ // shared funders
+ const synth=[];
+ for(const[f,list]of Object.entries(fund)){
+  if(set.has(f)){for(const x of list)addE(f,x.id,'B',x.v,x.ts);continue}
+  if(list.length<2)continue;
+  let info=null;try{info=await jget(`${H}/api/v2/addresses/${f}`)}catch(e){}
+  const kind=info?classify(info):'holder',lab=info?label(info):'';
+  if(kind==='cex'||kind==='contract'){// time-window nodes: 10 min buckets
+   const b={};for(const x of list){const k=Math.floor(x.ts/600);(b[k]=b[k]||[]).push(x)}
+   for(const[k,l]of Object.entries(b)){if(l.length<2)continue;const id=f+'@'+k;
+    synth.push({id,addr:f,synthetic:'time',label:(lab||short(f))+' @ '+new Date(k*600e3).toISOString().slice(0,16).replace('T',' ')+' UTC',share:0,kind:'synthetic'});
+    for(const x of l)addE(id,x.id,'B',x.v,x.ts)}
+  }else{synth.push({id:f,addr:f,synthetic:'funder',label:lab||'Shared funder',share:0,kind:'synthetic'});for(const x of list)addE(f,x.id,'B',x.v,x.ts)}
+ }
+ return{chain,token,sym:tk.symbol||'?',name:tk.name||'',sup,price,holdersCount:+tk.holders_count||+tk.holders||null,nodes:nodes.concat(synth),edges:[...edges.values()],win,at:Date.now(),errs:errs.length}
+}
+
+function clusterize(D){
+ const showH=$('showHidden').checked,tA=$('tA').checked,tB=$('tB').checked;
+ const nodes=D.nodes.filter(n=>showH||n.kind==='holder'||n.kind==='synthetic');
+ const ids=new Set(nodes.map(n=>n.id));
+ let links=D.edges.filter(e=>ids.has(e.source.id||e.source)&&ids.has(e.target.id||e.target)&&(e.tier==='A'?tA:tB)).map(e=>({...e,source:e.source.id||e.source,target:e.target.id||e.target}));
+ // drop synthetic nodes without links
+ const deg={};links.forEach(l=>{deg[l.source]=(deg[l.source]||0)+1;deg[l.target]=(deg[l.target]||0)+1});
+ const nn=nodes.filter(n=>n.kind!=='synthetic'||deg[n.id]>=2);const ok=new Set(nn.map(n=>n.id));links=links.filter(l=>ok.has(l.source)&&ok.has(l.target));
+ const P={};const f=x=>P[x]===x?x:(P[x]=f(P[x]));nn.forEach(n=>P[n.id]=n.id);
+ links.forEach(l=>{if(D.nodes.find(n=>n.id===l.source)?.kind==='holder'||true)P[f(l.source)]=f(l.target)});
+ const groups={};nn.forEach(n=>{n.deg=deg[n.id]||0;(groups[f(n.id)]=groups[f(n.id)]||[]).push(n)});
+ const clusters=[];
+ for(const g of Object.values(groups)){const h=g.filter(n=>n.kind!=='synthetic');
+  const share=h.reduce((s,n)=>s+n.share,0);
+  if(h.length>=2){const c=g.reduce((a,b)=>b.deg>a.deg?b:a);let hs=0;for(const ch of c.id)hs=(hs*31+ch.charCodeAt(0))>>>0;const col=PAL[hs%PAL.length];
+   const cl={id:clusters.length+1,members:h,share,color:col};clusters.push(cl);g.forEach(n=>{n.color=col;n.cl=cl})}
+  else g.forEach(n=>{n.color=n.kind==='holder'?'#56645c':n.kind==='synthetic'?'#56645c':'#3a4a6a';n.cl=null})}
+ clusters.sort((a,b)=>b.share-a.share);clusters.forEach((c,i)=>c.id=i+1);
+ // score over visible holders: clusters as entities
+ const H=D.nodes.filter(n=>n.kind==='holder');const tot=H.reduce((s,n)=>s+n.share,0)||1;
+ const ent=[];const seen=new Set();for(const c of clusters){if(c.members.every(m=>m.kind==='holder')){ent.push(c.share);c.members.forEach(m=>seen.add(m.id))}else{const s=c.members.filter(m=>m.kind==='holder');ent.push(s.reduce((a,m)=>a+m.share,0));s.forEach(m=>seen.add(m.id))}}
+ H.forEach(n=>{if(!seen.has(n.id))ent.push(n.share)});
+ const hhi=ent.reduce((s,x)=>s+(x/tot)**2,0);const maxC=clusters.length?Math.max(...clusters.map(c=>c.share)):0;
+ const score=Math.max(0,Math.min(100,100*(1-hhi)**2*(1-maxC/100)));
+ return{nodes:nn,links,clusters,score,hhi}
+}
+const R=n=>n.kind==='synthetic'?5:11*Math.sqrt(Math.max(n.share,0.05))+3;
+function render(D){
+ const V=clusterize(D);
+ $('ov').hidden=true;
+ const el=$('graph');
+ if(!G){G=ForceGraph()(el).backgroundColor('#000').nodeId('id').cooldownTime(6000).d3VelocityDecay(0.3)
+  .nodeLabel(n=>`<div style="background:#0b100dee;border:1px solid #2b5a40;border-radius:10px;padding:6px 10px;font:13px Inter,system-ui"><b>${esc(n.label||short(n.addr))}</b><br>${n.kind==='synthetic'?(n.synthetic==='time'?'Exchange withdrawal window':'Shared first funder'):'#'+n.rank+' · '+n.share.toFixed(3)+'% of supply'}<br><span style="color:#9fb">${esc(short(n.addr))}${n.kind!=='holder'&&n.kind!=='synthetic'?' · '+n.kind:''}</span></div>`)
+  .nodeCanvasObject((n,ctx,s)=>{if(!isFinite(n.x)||!isFinite(n.y))return;const r=R(n);ctx.beginPath();ctx.arc(n.x,n.y,r,0,7);
+   if(n.kind==='synthetic'){ctx.setLineDash([2,2]);ctx.strokeStyle=n.color;ctx.lineWidth=1.2;ctx.stroke();ctx.setLineDash([])}
+   else{const g=ctx.createRadialGradient(n.x-r/3,n.y-r/3,r/8,n.x,n.y,r);g.addColorStop(0,n.color+'ee');g.addColorStop(1,n.color+'55');ctx.fillStyle=g;ctx.fill();ctx.strokeStyle=n===SEL?'#fff':n.color;ctx.lineWidth=n===SEL?2/s:.8/s;ctx.stroke()}
+   if(n.kind!=='synthetic'&&r*s>14){ctx.fillStyle='#fff';ctx.font=`700 ${Math.min(r*.5,12/s*1.2)}px Inter,system-ui`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('#'+n.rank,n.x,n.y)}})
+  .nodePointerAreaPaint((n,c,ctx)=>{ctx.fillStyle=c;ctx.beginPath();ctx.arc(n.x,n.y,R(n)+2,0,7);ctx.fill()})
+  .linkColor(l=>l.tier==='A'?'rgba(93,255,176,.55)':'rgba(122,140,255,.45)').linkWidth(l=>l.tier==='A'?Math.min(3,1+Math.log10(l.count+1)):1)
+  .linkLineDash(l=>l.tier==='B'?[3,3]:null)
+  .linkDirectionalParticles(l=>SEL&&(l.source===SEL||l.target===SEL)?3:0).linkDirectionalParticleWidth(2.5)
+  .onNodeClick(n=>select(n)).onNodeDragEnd(n=>{n.fx=n.x;n.fy=n.y}).onNodeRightClick(n=>{n.fx=n.fy=undefined});
+  G.d3Force('charge').strength(n=>-R(n)*2-15).distanceMax(300);
+  G.d3Force('link').distance(l=>R(l.source)+R(l.target)+14);
+  new ResizeObserver(()=>G.width(el.clientWidth).height(el.clientHeight)).observe(el);
+ }
+ G.width(el.clientWidth).height(el.clientHeight).graphData({nodes:V.nodes,links:V.links});setTimeout(()=>G.zoomToFit(600,30),1800);
+ $('score').textContent=Math.round(V.score);$('score').style.color=V.score>66?'#5dffb0':V.score>33?'#ffb35d':'#ff5d7a';
+ $('clusters').innerHTML=V.clusters.length?V.clusters.slice(0,30).map(c=>`<div class=cl data-c="${c.id}"><span><span class=dot style="background:${c.color}"></span>Cluster ${c.id} · ${c.members.length} wallets</span><b>${c.share.toFixed(2)}%</b></div>`).join(''):'No clusters found among visible holders.';
+ $('clusters').querySelectorAll('.cl').forEach(d=>d.onclick=()=>{const c=V.clusters[+d.dataset.c-1];select(c.members.reduce((a,b)=>b.share>a.share?b:a))});
+ const hid=D.nodes.filter(n=>n.kind!=='holder'&&n.kind!=='synthetic').length;
+ $('meta').innerHTML=`${esc(D.name)} (${esc(D.sym)}) on ${esc(D.chain)} · top ${D.nodes.filter(n=>n.kind!=='synthetic').length} holders (${hid} exchange/contract/burn hidden${$('showHidden').checked?' – shown':''}) · ${V.links.length} links · ${V.clusters.length} clusters · data from Blockscout fetched ${new Date(D.at).toLocaleString()}${D.win&&D.win.t0?` · direct transfers scanned ${new Date(D.win.t0).toLocaleDateString()}–${new Date(D.win.t1).toLocaleDateString()} (blocks ${D.win.from}–${D.win.to}${D.win.stop?', public RPC stopped early':''})`:' · direct-transfer scan unavailable (public RPC refused), showing funder links only'}${D.errs?` · ${D.errs} lookups failed (rate limit), map may miss links`:''}`;
+ VIEW=V;
+}
+let SEL=null,VIEW=null,CUR='';
+function select(n){SEL=n;G&&G.centerAt(n.x,n.y,600)&&G.zoom(2.2,600);G&&G.linkDirectionalParticles(G.linkDirectionalParticles());
+ const H=HOSTS[DATA.chain];const c=n.cl;
+ const links=VIEW.links.filter(l=>l.source===n||l.target===n).slice(0,12).map(l=>{const o=l.source===n?l.target:l.source;return`<tr><td>${l.tier==='A'?'↔ '+l.count+' transfer'+(l.count>1?'s':''):'funded by same'}</td><td class=mono>${esc(o.label||short(o.addr))}</td></tr>`}).join('');
+ $('detail').innerHTML=`<b>${esc(n.label||(n.kind==='synthetic'?'Shared funder':'Holder #'+n.rank))}</b><div class=mono><a href="${H}/address/${esc(n.addr)}" target=_blank rel=noopener>${esc(n.addr)}</a></div>
+ ${n.kind!=='synthetic'?`<div>${n.share.toFixed(4)}% · ${Math.round(n.bal).toLocaleString()} ${esc(DATA.sym)}${DATA.price?' · $'+Math.round(n.bal*DATA.price).toLocaleString():''}</div>`:'<div class=muted>Not a top holder. Sent the first native coins to the linked wallets.</div>'}
+ ${n.tags?.length?`<div>${n.tags.map(t=>`<span class=pill>${esc(t)}</span>`).join(' ')}</div>`:''}
+ ${n.funder?`<div class=muted style="font-size:.8rem">First funder: <span class=mono>${esc(short(n.funder))}</span> on ${new Date(n.fundTs*1000).toISOString().slice(0,10)}</div>`:''}
+ ${c?`<div style="margin-top:6px"><span class=dot style="background:${c.color}"></span>Cluster ${c.id}: ${c.members.length} wallets hold <b>${c.share.toFixed(2)}%</b></div>`:''}
+ ${links?`<table>${links}</table>`:''}
+ <div style="margin-top:8px"><a href="report.html?address=${esc(n.addr)}">Full wallet report →</a> · <a href="wallet-flow.html#${esc(DATA.chain)}:${esc(n.addr)}">Fund flow →</a></div>`}
+async function run(){
+ const chain=$('chain').value,token=$('addr').value.trim(),N=+$('n').value;
+ if(!isAddr(token)){ov('<span class=err>That is not a valid 0x… contract address.</span>');return}
+ CUR=chain+':'+token;if(location.hash.slice(1)!==CUR)location.hash=CUR;$('go').disabled=true;
+ try{const k=cacheKey(chain,token,N);let D=null;
+  try{const c=JSON.parse(localStorage.getItem(k)||'null');if(c&&Date.now()-c.at<6*3600e3)D=c}catch(e){}
+  if(!D){D=await build(chain,token,N);if(!D)return;try{localStorage.setItem(k,JSON.stringify(D))}catch(e){}}
+  DATA=D;render(D)}
+ catch(e){ov(`<span class=err>Could not build the map: ${esc(e.message)}</span><div class=muted>Blockscout may be rate-limiting. Wait a minute and retry, or pick fewer holders.</div>`)}
+ finally{$('go').disabled=false}}
+$('go').onclick=run;
+['showHidden','tA','tB'].forEach(id=>$(id).onchange=()=>DATA&&render(DATA));
+$('csv').onclick=()=>{if(!VIEW)return;const rows=[['rank','address','label','share_pct','balance','cluster','first_funder']];
+ DATA.nodes.filter(n=>n.kind!=='synthetic').forEach(n=>rows.push([n.rank,n.addr,n.label,n.share.toFixed(6),n.bal,n.cl?n.cl.id:'',n.funder||'']));
+ const b=new Blob([rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`holders-${DATA.sym}.csv`;a.click()};
+function fromHash(){if(location.hash.slice(1)===CUR)return;const m=location.hash.slice(1).match(/^(eth|base|arbitrum|optimism):(0x[0-9a-fA-F]{40})$/);if(m){$('chain').value=m[1];$('addr').value=m[2];run()}}
+window.addEventListener('hashchange',fromHash);
+if(typeof ForceGraph==='undefined')ov('<span class=err>Graph library failed to load (CDN blocked?). Reload the page.</span>');else fromHash();
+</script></body></html>

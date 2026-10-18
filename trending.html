@@ -1,0 +1,90 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>Hot token board: trending DEX pools by chain | anonymusk</title>
+<meta name=description content="Free hot-token board. Trending DEX pools across chains with price move, volume, transactions, buyers, liquidity and age. On-chain data provided by GeckoTerminal.">
+<meta name=theme-color content="#07090c">
+<link rel=stylesheet href=style.css><script src=common.js></script>
+<style>
+main{max-width:1200px}
+.seg{display:inline-flex;border:1px solid #2a3a30;border-radius:10px;overflow:hidden}
+.seg button{background:#101612;color:#9fb;border-radius:0;padding:8px 12px;font-weight:700}
+.seg button[aria-pressed=true]{background:linear-gradient(90deg,#5dffb0,#7a8cff);color:#04130b}
+.tw{overflow-x:auto;border:1px solid #1d2a22;border-radius:14px;margin:12px 0}
+table{width:100%;border-collapse:collapse;font-size:.9rem;min-width:820px}
+th,td{padding:8px 10px;text-align:right;border-bottom:1px solid #1d2a22;white-space:nowrap}
+th{position:sticky;top:0;background:#0e1411;color:#9fb;font-weight:700;cursor:pointer;user-select:none}
+td:nth-child(2),th:nth-child(2){text-align:left}
+tr:hover td{background:#0c120e}
+.num{font-family:ui-monospace,Menlo,Consolas,monospace}
+.tok{display:flex;align-items:center;gap:8px}.tok img{width:22px;height:22px;border-radius:50%;background:#1d2a22}
+.up{color:#5dffb0}.dn{color:#ff5d7a}
+.pill{font-size:.75rem;padding:2px 8px;border-radius:99px;border:1px solid #2a3a30;color:#9fb}
+.attr{font-size:.9rem}
+.err{color:#ff8a9e}
+.new{color:#ffb35d}
+@media(max-width:600px){.hide-m{display:none}table{min-width:560px}}
+</style></head><body><main>
+<h1>🔥 Hot token board</h1>
+<p class=muted>The DEX pools trending right now across chains, with the numbers that matter side by side. Ranking is GeckoTerminal's trending order (their mix of engagement, volume, transactions and pool safety checks). We don't re-rank or predict anything.</p>
+<div class="card row">
+ <select id=net aria-label=Network><option value="">All chains</option><option value=solana>Solana</option><option value=eth>Ethereum</option><option value=base>Base</option><option value=bsc>BNB Chain</option><option value=arbitrum>Arbitrum</option><option value=ton>TON</option><option value=tron>Tron</option><option value=sui-network>Sui</option></select>
+ <span class=seg id=dur><button data-d=5m>5m</button><button data-d=1h aria-pressed=true>1h</button><button data-d=6h>6h</button><button data-d=24h>24h</button></span>
+ <label class=muted style="display:inline-flex;gap:6px;align-items:center"><input type=checkbox id=auto style="width:auto" checked> auto-refresh 60s</label>
+ <span id=st class=pill>loading…</span>
+</div>
+<p class=attr><a href="https://www.geckoterminal.com/?utm_source=anonymusk&utm_medium=referral" target=_blank rel=noopener>On-chain data provided by GeckoTerminal</a> · <span class=muted id=when></span></p>
+<div class=tw><table><thead><tr><th data-k=rank>#</th><th data-k=name>Token / pool</th><th data-k=price>Price</th><th data-k=chg>Δ <span class=wl>1h</span></th><th data-k=vol>Volume <span class=wl>1h</span></th><th data-k=tx class=hide-m>Txns <span class=wl>1h</span></th><th data-k=buyers class=hide-m>Buyers <span class=wl>1h</span></th><th data-k=liq>Liquidity</th><th data-k=fdv class=hide-m>FDV / mcap</th><th data-k=age>Age</th></tr></thead><tbody id=tb><tr><td colspan=10 class=muted style="text-align:center">Loading…</td></tr></tbody></table></div>
+<div class=card style="font-size:.85rem"><b>Notes.</b> Source: GeckoTerminal public API v2 <code>trending_pools</code> (free, no key, about 10 calls/min, cached ~1 min on their side). We call it at most once a minute per open tab and back off on HTTP 429. Click a row to open the pool on GeckoTerminal. Pools under 24 h old are marked <span class=new>new</span>. Trending ≠ safe: new pools are often rugs or honeypots. Prices and volumes are as reported by GeckoTerminal at the time shown.</div>
+<p class=muted style="font-size:.85rem">Not financial advice. No predictions. Do your own research. Want a deep dive on a wallet? <a href="report.html">Wallet audit report →</a> · Who holds it? <a href="holder-map.html">Holder bubble map →</a></p>
+</main>
+<script>
+'use strict';
+const API='https://api.geckoterminal.com/api/v2';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const safeImg=u=>/^https:\/\/[a-z0-9.-]+\.(coingecko|geckoterminal)\.com\//i.test(u||'')?u:'';
+const NET={solana:'Solana',eth:'Ethereum',base:'Base',bsc:'BNB',arbitrum:'Arbitrum',ton:'TON',tron:'Tron','sui-network':'Sui',polygon_pos:'Polygon',avax:'Avalanche'};
+let dur='1h',rows=[],sortK='rank',sortD=1,timer=null,lastCall=0,backoff=0;
+const f=n=>{if(n==null||!isFinite(n))return'—';const a=Math.abs(n);return a>=1e9?(n/1e9).toFixed(2)+'B':a>=1e6?(n/1e6).toFixed(2)+'M':a>=1e3?(n/1e3).toFixed(1)+'K':a.toFixed(0)};
+const fp=p=>{if(!p)return'—';if(p>=1)return'$'+p.toLocaleString(undefined,{maximumFractionDigits:4});const s=p.toPrecision(3);return'$'+(p<1e-6?Number(s).toExponential(2):s)};
+const age=ms=>{const h=ms/36e5;return h<1?Math.round(h*60)+'m':h<48?Math.round(h)+'h':Math.round(h/24)+'d'};
+const K={'5m':'m5','1h':'h1','6h':'h6','24h':'h24'};
+async function load(){
+ const now=Date.now();if(now-lastCall<15000&&rows.length)return;lastCall=now;
+ const net=$('net').value;$('st').textContent='loading…';$('st').className='pill';
+ const url=`${API}/${net?'networks/'+encodeURIComponent(net)+'/trending_pools':'networks/trending_pools'}?duration=${dur}&include=base_token,network&page=1`;
+ try{const r=await fetch(url,{headers:{Accept:'application/json;version=20230203'}});
+  if(r.status===429){backoff=Math.min(300,(backoff||30)*2);throw new Error(`GeckoTerminal rate limit hit, retrying in ${backoff}s`)}
+  if(!r.ok)throw new Error('HTTP '+r.status);backoff=0;
+  const j=await r.json();const inc={};(j.included||[]).forEach(x=>inc[x.type+':'+x.id]=x.attributes||{});
+  const k=K[dur];
+  rows=(j.data||[]).map((p,i)=>{const a=p.attributes||{};const bt=inc['token:'+p.relationships?.base_token?.data?.id]||{};const netId=p.relationships?.network?.data?.id||String(p.id).split('_')[0];
+   const tx=a.transactions?.[k]||{};return{rank:i+1,id:p.id,net:netId,addr:a.address,name:a.name||'',sym:bt.symbol||String(a.name||'').split(' / ')[0],img:safeImg(bt.image_url),
+    price:+a.base_token_price_usd||0,chg:+a.price_change_percentage?.[k],vol:+a.volume_usd?.[k],tx:(tx.buys||0)+(tx.sells||0),buys:tx.buys||0,sells:tx.sells||0,buyers:tx.buyers||0,
+    liq:+a.reserve_in_usd,fdv:+(a.market_cap_usd||a.fdv_usd),mc:!!a.market_cap_usd,age:a.pool_created_at?Date.now()-Date.parse(a.pool_created_at):null}});
+  $('when').textContent='Fetched '+new Date().toLocaleTimeString()+' (your time) · '+rows.length+' pools · window '+dur;
+  $('st').textContent='live';$('st').className='pill up';draw()}
+ catch(e){$('st').textContent='error';$('st').className='pill err';$('when').innerHTML='<span class=err>'+esc(e.message)+'</span>'+(rows.length?' · showing the last good data':'');if(!rows.length)$('tb').innerHTML=`<tr><td colspan=10 class=err style="text-align:center">Could not load trending pools: ${esc(e.message)}</td></tr>`;
+  if(backoff){clearTimeout(timer);timer=setTimeout(()=>{lastCall=0;load()},backoff*1000)}}
+}
+function draw(){
+ const s=[...rows].sort((a,b)=>{const x=a[sortK],y=b[sortK];return(typeof x==='string'?x.localeCompare(y):((x??-1e18)-(y??-1e18)))*sortD});
+ document.querySelectorAll('.wl').forEach(e=>e.textContent=dur);
+ $('tb').innerHTML=s.map(r=>`<tr data-u="https://www.geckoterminal.com/${encodeURIComponent(r.net)}/pools/${encodeURIComponent(r.addr||'')}?utm_source=anonymusk&utm_medium=referral" style="cursor:pointer">
+ <td class=num>${r.rank}</td>
+ <td><div class=tok>${r.img?`<img src="${esc(r.img)}" alt="" loading=lazy referrerpolicy=no-referrer>`:'<img alt="">'}<div><b>${esc(r.sym)}</b> <span class=pill>${esc(NET[r.net]||r.net)}</span>${r.age!=null&&r.age<864e5?' <span class=new>new</span>':''}<br><span class=muted style="font-size:.8rem">${esc(r.name)}</span></div></div></td>
+ <td class=num>${fp(r.price)}</td>
+ <td class="num ${r.chg>=0?'up':'dn'}">${isFinite(r.chg)?(r.chg>0?'+':'')+r.chg.toFixed(1)+'%':'—'}</td>
+ <td class=num>$${f(r.vol)}</td>
+ <td class="num hide-m" title="${r.buys} buys / ${r.sells} sells">${f(r.tx)}</td>
+ <td class="num hide-m">${f(r.buyers)}</td>
+ <td class=num>$${f(r.liq)}</td>
+ <td class="num hide-m" title="${r.mc?'market cap':'fully diluted valuation'}">$${f(r.fdv)}${r.mc?'':'*'}</td>
+ <td class=num>${r.age!=null?age(r.age):'—'}</td></tr>`).join('')||'<tr><td colspan=10 class=muted style="text-align:center">No trending pools returned.</td></tr>';
+ $('tb').querySelectorAll('tr[data-u]').forEach(tr=>tr.onclick=()=>window.open(tr.dataset.u,'_blank','noopener'));
+}
+document.querySelectorAll('th[data-k]').forEach(th=>th.onclick=()=>{const k=th.dataset.k;sortD=sortK===k?-sortD:(k==='rank'||k==='name'||k==='age'?1:-1);sortK=k;draw()});
+$('dur').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('dur').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));dur=b.dataset.d;lastCall=0;load()});
+$('net').onchange=()=>{lastCall=0;load()};
+setInterval(()=>{if($('auto').checked&&!document.hidden&&!backoff){lastCall=0;load()}},60000);
+load();
+</script></body></html>
