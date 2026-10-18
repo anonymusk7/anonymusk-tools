@@ -3,7 +3,7 @@
    this file only adds click events to it). Safe to load with `defer` on any page. */
 /* Signup forms (form[data-signup]): the one place to set the Formspree form id, site-wide.
    '' = forms open a pre-filled mailto: to the studio inbox (current). Set e.g. 'xayzabcd' to POST to https://formspree.io/f/<id>. */
-var FORMSPREE_ID='';
+var FORMSPREE_ID = 'mnpjrabb';
 (function(){
   'use strict';
   var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
