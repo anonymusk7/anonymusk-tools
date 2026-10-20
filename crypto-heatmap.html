@@ -21,9 +21,12 @@ h2{font-size:1.3rem;margin:.1em 0 .4em}
 #map{position:relative;width:100%;height:560px;border-radius:14px;overflow:hidden;background:var(--bg-inset);border:1px solid var(--border);touch-action:manipulation}
 .t{position:absolute;box-sizing:border-box;border:1px solid var(--bg);overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff;cursor:pointer;line-height:1.1;transition:background-color .4s,filter .15s}
 .t:hover,.t.sel{filter:brightness(1.25);z-index:2;outline:2px solid var(--text);outline-offset:-2px}
-.t .s{font-weight:800;letter-spacing:.02em;text-shadow:0 1px 2px rgba(0,0,0,.6)}
-.t .p{font-family:var(--mono);opacity:.95;text-shadow:0 1px 2px rgba(0,0,0,.6)}
-.t .v{font-family:var(--mono);opacity:.7;font-size:.8em}
+.t .s{font-weight:800;letter-spacing:.02em}
+.t .p{font-family:var(--mono)}
+.t .v{font-family:var(--mono);font-size:.8em}
+.t{text-shadow:0 1px 2px rgba(0,0,0,.85),0 0 4px rgba(0,0,0,.6)}
+/* light tiles: dark text (contrast picked per tile by luminance, always >=4.5:1) */
+.t.lt{color:#000;text-shadow:0 1px 2px rgba(255,255,255,.55),0 0 4px rgba(255,255,255,.35)}
 #ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(7,9,12,.85);border-radius:14px;z-index:5;text-align:center;padding:20px}
 #ov[hidden]{display:none}
 .spin{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--accent-text);border-right-color:var(--accent-text);border-radius:50%;animation:sp 1s linear infinite}
@@ -138,7 +141,11 @@ function isStable(c){
 // Diverging color: red (#ff3d5e) ← neutral (#161a24) → green (#14d47a), clamped to ±range
 const NEG=[255,61,94],MID=[27,34,32],POS=[20,212,122];
 function mix(a,b,t){return a.map((v,i)=>Math.round(v+(b[i]-v)*t))}
-function color(v,r){if(v==null||!isFinite(v))return'rgb(40,44,52)';let t=Math.max(-1,Math.min(1,v/r));t=Math.sign(t)*Math.pow(Math.abs(t),.75);const c=t<0?mix(MID,NEG,-t):mix(MID,POS,t);return`rgb(${c})`}
+function rgbFor(v,r){if(v==null||!isFinite(v))return[40,44,52];let t=Math.max(-1,Math.min(1,v/r));t=Math.sign(t)*Math.pow(Math.abs(t),.75);return t<0?mix(MID,NEG,-t):mix(MID,POS,t)}
+function color(v,r){return`rgb(${rgbFor(v,r)})`}
+// WCAG relative luminance; black text wins when (L+.05)/.05 > 1.05/(L+.05), i.e. L > ~.179
+function lum(c){const[R,G,B]=c.map(x=>{x/=255;return x<=.03928?x/12.92:Math.pow((x+.055)/1.055,2.4)});return .2126*R+.7152*G+.0722*B}
+function lightBg(c){return lum(c)>.179}
 
 // Squarified treemap (Bruls, Huizing, van Wijk). items: [{v,...}] sorted desc. Returns [{x,y,w,h,item}]
 function squarify(items,X,Y,W,H){
@@ -167,7 +174,7 @@ function render(){
  const frag=document.createDocumentFragment();tiles=[];
  for(const R of rects){
   const c=R.item.c,v=c[k],d=document.createElement('div');
-  d.className='t'+(c.id===selId?' sel':'');d.dataset.id=c.id;
+  d.className='t'+(lightBg(rgbFor(v,r))?' lt':'')+(c.id===selId?' sel':'');d.dataset.id=c.id;
   d.style.cssText=`left:${R.x}px;top:${R.y}px;width:${R.w}px;height:${R.h}px;background-color:${color(v,r)}`;
   const m=Math.min(R.w,R.h*1.6);
   if(R.w>26&&R.h>16){

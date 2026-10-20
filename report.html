@@ -3,6 +3,7 @@
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><link rel="icon" href="favicon.ico" sizes="32x32"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <meta name="description" content="Wallet audit report for any EVM or Solana address: holdings on 7 EVM chains + Solana, open token approvals with revoke links, a risk grade A–F and a printable PDF. Free snapshot, full report $15.">
 <link rel="canonical" href="https://anonymusk7.github.io/anonymusk-tools/report.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Wallet Audit Report","description":"Full wallet audit report: holdings on 7 EVM chains + Solana, open token approvals with revoke links, risk grade A–F and printable PDF.","url":"https://anonymusk7.github.io/anonymusk-tools/report.html","image":"https://anonymusk7.github.io/anonymusk-tools/assets/og.png","brand":{"@type":"Brand","name":"anonymusk"},"offers":{"@type":"Offer","price":"15.00","priceCurrency":"USD","url":"https://anonymusk.gumroad.com/l/ubplh"}}</script>
 <meta property="og:type" content="website"><meta property="og:site_name" content="anonymusk tools"><meta property="og:url" content="https://anonymusk7.github.io/anonymusk-tools/report.html">
 <meta property="og:title" content="Wallet Audit Report | anonymusk"><meta property="og:description" content="Wallet audit report for any EVM or Solana address: holdings on 7 EVM chains + Solana, open token approvals with revoke links, a risk grade A–F and a printable PDF. Free snapshot, full report $15.">
 <meta property="og:image" content="https://anonymusk7.github.io/anonymusk-tools/assets/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
@@ -57,14 +58,14 @@ h2{break-after:avoid}}
 <div class=prhead><b>anonymusk · Wallet Audit Report</b> · anonymusk7.github.io/anonymusk-tools/report.html</div>
 <div class="crumbs"><a href="./#tools">Tools</a><span aria-hidden="true">/</span><span>Wallet · Paid</span></div><h1>Wallet Audit Report</h1>
 <p class="muted noprint">Paste a public EVM (0x…) or Solana address. The report is built <b>in your browser</b> from free public data: public RPCs, Blockscout, and DefiLlama prices. No keys, no sign-in, no wallet connect. <a href="roast.html">Just want a roast? →</a></p>
-<div class="row noprint"><input id=a size=46 value="0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"><button id=go>Build report</button><button id=pr class=ghost disabled>🖨 Print / Save PDF</button><span id=tier class=pill></span></div>
+<div class="row noprint"><input id=a aria-label="Wallet address (EVM or Solana)" size=46 value="0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"><button id=go>Build report</button><button id=pr class=ghost disabled>🖨 Print / Save PDF</button><span id=tier class=pill></span></div>
 <div id=st class="muted noprint"></div>
 <div id=out></div>
 <div class="sec pro noprint" id=gate hidden>
  <h2>🔓 Unlock the full audit: <span id=price>one-time</span></h2>
  <p>The free snapshot covers section 1. The full report adds: <b>every holding on 7 chains</b> with liquidity flags · an <b>open-approvals audit</b> (unlimited allowances + NFT operator approvals, with revoke links) · <b>risk score A–F</b> with plain-English notes · an <b>activity & hygiene</b> review · a <b>printable PDF</b> for any number of wallets.</p>
  <div class=row><a id=buy class=btn target=_blank rel=noopener>Get full report on Gumroad →</a><span class=muted>One-time payment. Your license key comes in the Gumroad receipt.</span></div>
- <div class=row style="margin-top:12px"><input id=lic placeholder="Paste license key (XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX)" size=44><button id=act>Unlock</button></div><div id=lst class=muted></div>
+ <div class=row style="margin-top:12px"><input id=lic aria-label="License key" placeholder="Paste license key (XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX)" size=44><button id=act>Unlock</button></div><div id=lst class=muted></div>
 </div>
 <div id=cta></div>
 <div class="sec pro noprint" id=proOn hidden><b style="color:var(--accent-text)">✓ Full report unlocked</b> on this browser. <a href=# id=deact>Remove key</a></div>
